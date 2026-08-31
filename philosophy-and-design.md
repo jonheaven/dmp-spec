@@ -1,7 +1,7 @@
 # Dogenals Marketplace Protocol (ÐMP)
 ## Philosophy and Design Decisions
 
-Last Updated: 2026-04-14
+Last Updated: 2026-08-30
 Status: Canonical project philosophy and product architecture reference
 
 ---
@@ -35,6 +35,10 @@ Dogenals follows a Doge-native, Robin Hood style ethos:
 ## 2. Why ÐMP Exists
 
 ÐMP exists to remove dependence on centralized marketplace databases and APIs.
+
+The wire follows Satoshi + Casey: the **seller PSDT** is the contract; the **inscription** is an
+indexable pointer. Omit implied fields. Pay venues with addresses, not labels. Keep every marketplace
+op (`list` through `vote`).
 
 With ÐMP, market behavior is encoded as chain-verifiable inscriptions:
 

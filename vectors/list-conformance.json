@@ -1,11 +1,11 @@
 {
   "version": "1.0",
-  "protocol": "dmp",
+  "protocol": "Ð:MP",
   "description": "Extended list-operation conformance vectors for ÐMP.",
   "vectors": [
     {
       "id": "list-valid-basic",
-      "description": "Valid basic list operation with all required fields",
+      "description": "Valid basic list with explicit v/currency",
       "schema": "schemas/list.json",
       "expect": "pass",
       "payload": {
@@ -15,6 +15,19 @@
         "inscription_id": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdefi0",
         "price": "100000000",
         "currency": "DOGE",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "list-valid-lean-defaults",
+      "description": "Valid: omitted v/currency/chain/listing_type use MUST-109 defaults",
+      "schema": "schemas/list.json",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP",
+        "op": "list",
+        "inscription_id": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdefi0",
+        "price": "100000000",
         "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
       }
     },
@@ -29,24 +42,9 @@
         "op": "list",
         "inscription_id": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890i0",
         "price": "250000000",
-        "currency": "DOGE",
         "seller": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
         "chain": "dogecoin",
         "expiry": 1750000000
-      }
-    },
-    {
-      "id": "list-invalid-missing-currency",
-      "description": "Invalid: currency is a required field",
-      "schema": "schemas/list.json",
-      "expect": "fail",
-      "payload": {
-        "p": "Ð:MP",
-        "v": "1.0",
-        "op": "list",
-        "inscription_id": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdefi0",
-        "price": "100000000",
-        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
       }
     },
     {

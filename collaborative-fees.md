@@ -2,11 +2,11 @@
 
 Version: v0.1 (Draft extension)  
 Status: Greenfield — additive to ÐMP v1.0  
-Last Updated: 2026-08-05  
+Last Updated: 2026-08-30  
 Chain: Dogecoin  
 
 **Parent:** [spec.md](./spec.md)  
-**Ecosystem plan:** Dogenals operator collective (studio docs; not in this repo).
+**Ecosystem plan:** [docs/OPERATOR_COLLECTIVE_PLAN.md](../../../docs/OPERATOR_COLLECTIVE_PLAN.md)
 
 ---
 
@@ -48,14 +48,16 @@ Optional on `op: "list"` (and auction lists). Unknown fields remain ignored by o
 | `market_fee_bps` | string/int | Total marketplace fee bps (e.g. `"200"` = 2%) |
 | `listing_fee_address` | string | Dogecoin address for listing venue |
 | `listing_fee_share_bps` | string/int | Share of market fee to listing venue (default `5000`) |
-| `listing_marketplace` | string | Optional human/id tag (`dogenals.com`, slug, domain) |
+| `listing_marketplace` | string | Optional **label** (`dogecoin.dog`, slug, domain). Not a payee. |
 
 ### Normative defaults
 
 - If `market_fee_bps` absent → **0** market fee (royalty still applies if set).  
 - If `listing_fee_share_bps` absent and market fee > 0 → **5000**.  
 - If `market_fee_bps` > 0 and `listing_fee_address` absent → list is **valid** but settlement cannot pay listing venue; indexers SHOULD flag `listing_fee_unspecified`.  
+- `listing_marketplace` MUST NOT be treated as a fee address.  
 - `market_fee_bps` + `royalty_bps` MUST leave seller residual ≥ dust policy (implementation min 0.01 DOGE recommended).
+- Classic OpenOrdex fills (seller output = full `price`) are valid when `market_fee_bps` is 0 or omitted. Do not inscribe a 2% rake unless the seller PSDT locks the residual.
 
 ### Example
 
@@ -66,7 +68,6 @@ Optional on `op: "list"` (and auction lists). Unknown fields remain ignored by o
   "op": "list",
   "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
   "price": "10000000000",
-  "currency": "DOGE",
   "seller": "DSellerAddressxxxxxxxxxxxxxxxxxxxx",
   "royalty_address": "DCreatorAddressxxxxxxxxxxxxxxxxxxx",
   "royalty_bps": "500",
@@ -74,9 +75,7 @@ Optional on `op: "list"` (and auction lists). Unknown fields remain ignored by o
   "listing_fee_address": "DListingVenueFeeAddressxxxxxxxxxxx",
   "listing_fee_share_bps": "5000",
   "listing_marketplace": "dogenals.com",
-  "psdt": "cHNidP8B...",
-  "chain": "dogecoin",
-  "ts": 1700001000
+  "psdt": "cHNidP8B..."
 }
 ```
 

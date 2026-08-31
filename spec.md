@@ -3,9 +3,9 @@
 
 Version: v1.0 (Draft)
 Status: Pre-launch draft
-Last Updated: 2026-05-08
+Last Updated: 2026-08-30
 Chain: Dogecoin (and compatible Dogecoin-fork chains)
-**Canonical repo:** [github.com/jonheaven/dmp-spec](https://github.com/jonheaven/dmp-spec)
+**Canonical public spec:** [github.com/jonheaven/dmp-spec](https://github.com/jonheaven/dmp-spec)
 
 ÐMP is part of the first Dogenals launch drop. It has not been minted or battle-tested as a Dogenals protocol yet;
 implementations SHOULD treat it as a precise target for independent testing.
@@ -13,7 +13,7 @@ implementations SHOULD treat it as a precise target for independent testing.
 ### Naming (informative)
 
 - **Display name (user-facing):** **ÐMP** (Dogenals Marketplace Protocol).
-- **Canonical public spec:** this repository ([jonheaven/dmp-spec](https://github.com/jonheaven/dmp-spec)).
+- **Path:** `spec/protocols/dmp/` (studio copy). Public canonical: **[jonheaven/dmp-spec](https://github.com/jonheaven/dmp-spec)**.
 - **On-chain marker:** `p: "Ð:MP"`.
 - **Stable assets:** Schema filenames and `$id` URLs remain unchanged for compatibility.
 
@@ -24,7 +24,10 @@ implementations SHOULD treat it as a precise target for independent testing.
 1. Introduction
 2. Terminology
 3. Envelope Format
+   - 3.1 Top-level fields
+   - 3.2 Conventions
    - 3.3 Timestamp sanity
+   - 3.4 Fill template (PSDT)
 4. Operations Reference
    - 4.1 list
    - 4.2 bid
@@ -69,27 +72,47 @@ auditable and legible, not impossible. See SECURITY.md for the full threat model
 
 ### Design Goals
 
+- The **fill template is the contract** (seller-signed PSDT). The inscription is a pointer + proof, not a marketplace app ABI.
 - Trustless verification from chain data only.
 - Portable provenance and full sales history.
-- Additive versioning: new fields and ops do not break old parsers.
+- Additive fields: unknown keys MUST be ignored.
 - UTXO-native ownership verification.
-- Strong creator provenance through signatures.
 - Honest provenance gap detection — never hide breaks.
+
+### Wire philosophy (Satoshi + Casey)
+
+Dogecoin already expresses “this UTXO moves if I get this output” as
+`SIGHASH_SINGLE | ANYONECANPAY`. ÐMP does not re-encode that in twenty JSON keys.
+
+- **Do not inscribe implied facts.** On Dogecoin mainnet, `currency` is DOGE, `chain` is `dogecoin`,
+  and a `list` with one seller output is a fixed-price list. Those fields MAY be omitted; if present
+  they MUST match the defaults below.
+- **Do not compact-rename the remaining keys** (`lm` for `listing_marketplace`). Fewer fields first.
+  A later optional compact body MAY use `"c"` (compression / tagged map). Parsers MUST ignore unknown
+  top-level keys.
+- **Money, not labels.** `listing_fee_address` (with `market_fee_bps`) is how a listing venue is paid.
+  `listing_marketplace` is an optional human tag (domain/slug). Indexers MUST NOT treat the tag as a
+  payee.
+- **Keep every op.** `list`, `bid`, `auction`, `offer`, `counteroffer`, `accept`, `decline`, `cancel`,
+  `settle`, `transfer`, `collection`, `collection-update`, `vote` remain. This reboot thins the
+  *envelope*, it does not remove the marketplace.
 
 ### Size Guidelines
 
-ÐMP uses plain, human-readable JSON to maximize transparency and long-term verifiability.
+Bodies SHOULD stay under **4 KB** (soft spam cap). The dominant bytes in a `list` are almost never
+the metadata keys: Dogecoin listing PSDTs embed `nonWitnessUtxo` (the **full previous transaction**
+of the dog UTXO). A reveal-sized parent makes a multi-KB `psdt` even when JSON keys are short.
 
-- Implementations SHOULD reject ÐMP inscriptions larger than 4 KB as a soft spam-prevention measure.
-- Future versions may introduce optional compact formats using new top-level fields (e.g., `"c"` for
-  compression).
-- Parsers MUST gracefully ignore unknown formats and fall back to raw JSON whenever possible.
+- Implementations SHOULD reject ÐMP inscriptions larger than 4 KB.
+- Sellers SHOULD move the dog to a **skinny child UTXO** (simple self-transfer) before listing if they
+  intend to embed `psdt` on-chain.
+- Future versions MAY add an optional compact `"c"` body. Parsers MUST fall back to raw JSON.
 
 ### Versioning
 
 - v1.0 is the launch draft.
-- The `v` field MUST be `"1.0"`.
-- After public launch, future breaking changes MUST be explicitly versioned and documented.
+- `v`, when present, MUST be `"1.0"`. When absent, indexers MUST treat the op as `"1.0"`.
+- After public launch, breaking wire changes MUST be a new `v`.
 
 ---
 
@@ -118,9 +141,10 @@ auditable and legible, not impossible. See SECURITY.md for the full threat model
 
 Every ÐMP Intent MUST include:
 
-- `p`: `"Ð:MP"`
-- `v`: protocol version string (`"1.0"`)
+- `p`: `"Ð:MP"` (legacy lowercase `"dmp"` MAY be accepted by indexers)
 - `op`: operation identifier
+
+`v` MAY be omitted (defaults to `"1.0"`).
 
 ### 3.2 Conventions
 
@@ -129,7 +153,12 @@ Every ÐMP Intent MUST include:
   values that do not fit in **unsigned 64-bit** arithmetic (`≤ 2^64 − 1`) to avoid silent overflow in indexers
   (MUST-008).
 - Timestamps are Unix epoch seconds (integer).
+- **Defaults (MUST-109):** If omitted: `v` = `"1.0"`; `currency` = `"DOGE"`; `chain` = `"dogecoin"`;
+  `listing_type` on `op:"list"` = `"fixed_price"`. If any of these is present, it MUST equal the default
+  (except `listing_type`, which MAY be `"auction"`).
 - `psdt`, when present, MUST be standard base64 (no whitespace) encoding of PSDT bytes.
+- `psdt_hash`, when present, MUST be 64-char lowercase hex SHA-256 of the **raw PSDT bytes** (not the
+  base64 string). If both `psdt` and `psdt_hash` are present, the hash MUST match (MUST-110).
 - Unknown fields MUST be ignored by indexers.
 - JSON payload MUST be valid UTF-8.
 - The `chain` field, when present, MUST equal `"dogecoin"` for mainnet Dogenals. Indexers SHOULD reject ops
@@ -155,6 +184,23 @@ Every ÐMP Intent MUST include:
   comparing to **MTP(block)** of a confirming block (e.g. MUST-102, MUST-108). This reduces miner skew for
   relative ordering inscribed by users.
 
+### 3.4 Fill template (PSDT)
+
+A **PSDT** is a Partially Signed Dogecoin Transaction (BIP174 PSBT bytes on Dogecoin). For a fixed-price
+list the seller signs **input 0** (the dog UTXO) with `SIGHASH_SINGLE | ANYONECANPAY` and locks **output 0**
+to themselves at `price` (or the residual seller amount when collaborative fees apply — see
+[collaborative-fees.md](collaborative-fees.md)).
+
+**Portable Buy Now** (any venue, no listing-server): the `list` body SHOULD include `psdt`.
+
+**Hash-only list:** `psdt_hash` without `psdt` is a valid intent. Chain-alone fill is then **impossible**
+until a party publishes the matching PSDT out of band. Indexers MAY cache PSDT bytes keyed by hash when
+they see them. This is for fat parent transactions, not for hiding the contract.
+
+Dogecoin is legacy P2PKH: listing PSDTs carry `nonWitnessUtxo` (the entire previous tx). Extra buyer
+**coins** (payment + dummy inputs) belong on the **buy** PSDT, not the list. Extra **outputs** (royalty,
+listing fee) are cheap. Extra **inputs** are expensive.
+
 ---
 
 ## 4. Operations Reference
@@ -168,29 +214,23 @@ Declares seller intent to sell an inscription.
 ```json
 {
   "p": "Ð:MP",
-  "v": "1.0",
   "op": "list",
   "inscription_id": "<txid>i<vout>",
   "price": "<koinu>",
-  "currency": "DOGE",
   "seller": "<Dogecoin address>",
-  "listing_type": "fixed_price",
-  "auction_mode": "time_based",
-  "min_bid_increment": "<koinu>",
-  "royalty_address": "<Dogecoin address>",
-  "royalty_bps": "500",
-  "collection_id": "<collection inscription_id>",
-  "expiry": 1800000000,
-  "psdt": "<base64 PSDT>",
-  "chain": "dogecoin",
-  "nonce": "<optional string>",
-  "ts": 1700000000
+  "psdt": "<base64 PSDT>"
 }
 ```
 
+Optional (only when they change behavior): `v`, `ts`, `expiry`, `royalty_address`, `royalty_bps`,
+`market_fee_bps`, `listing_fee_address`, `listing_fee_share_bps`, `listing_marketplace` (tag only),
+`collection_id`, `psdt_hash`, `listing_type` / `auction_mode` / `min_bid_increment` for auctions,
+`co_sellers`, `nonce`.
+
 #### Notes
 
-- `listing_type` is optional. Allowed values: `fixed_price`, `auction`.
+- `listing_type` is optional (default `fixed_price`). Allowed values: `fixed_price`, `auction`.
+- `listing_marketplace` is a human tag. Pay the listing venue with `listing_fee_address` + `market_fee_bps`.
 - `auction_mode` is used when `listing_type` is `"auction"`.
 - Allowed `auction_mode` values: `time_based`, `seller_can_accept_early`, `no_early_accept`.
 - `seller_can_accept_early` allows seller to settle a valid bid before expiry.
@@ -460,12 +500,12 @@ Defines authoritative collection metadata and membership rules.
 - **MUST** appear only on a **root** `collection` op (the `collection` inscription that establishes the
   `slug` per this protocol). **MUST NOT** be added, removed, or changed via
   [`collection-update`](#46-collection-update) (including inside `patch`).
-- When the same *collection* inscription *also* carries a DRC-721 / DogeRelics Core native
+- When the same *collection* inscription *also* carries a [DRC-721](../dogerelics/README.md) native
   `parent` key in the *ord* inscription trailer, indexers that implement DRC-721 **MUST** enforce
   [MUST-057](#136-collection): the value **MUST** match the same `parent` as the 36 B wire
   (same ÐMP string id) or the op is **inconsistent** (reject or flag, per policy).
 - This ÐMP field is **application metadata** for marketplaces. The on-chain *strong* parent/child
-  link remains DogeRelics + UTXO rules (native `parent` tag + UTXO validation).
+  link remains DogeRelics + UTXO rules in [DogeRelics §3](../dogerelics/README.md#3-parent-and-utxo-validation).
   A collection without a native ÐMP `parent_inscription_id` and without a DRC-721 `parent` tag is still
   a valid ÐMP `collection` when all other `collection` rules pass.
 
@@ -1472,8 +1512,8 @@ Any op failing a MUST rule is invalid.
 
 ### 13.1 Universal
 
-- MUST-001: `p` equals `"Ð:MP"`.
-- MUST-002: `v` is a recognized version. indexers accept `"1.0"`.
+- MUST-001: `p` equals `"Ð:MP"` (indexers MAY also accept legacy `"dmp"`).
+- MUST-002: `v`, when present, is a recognized version. Indexers accept `"1.0"`. When `v` is absent, treat as `"1.0"`.
 - MUST-003: `op` is recognized.
 - MUST-004: valid UTF-8 JSON.
 - MUST-005: unknown fields ignored (not errors).
@@ -1484,6 +1524,8 @@ Any op failing a MUST rule is invalid.
   characters as INVALID.
 - MUST-102: `ts` sanity vs MTP (or documented `nTime` fallback) — Section 3.3.
 - MUST-103: use each op’s own JSON `ts` for relative comparisons unless this spec names MTP(block) — Section 3.3.
+- MUST-109: omitted `currency` / `chain` / list `listing_type` default to `"DOGE"` / `"dogecoin"` / `"fixed_price"` (Section 3.2). Present values MUST match those defaults except `listing_type` MAY be `"auction"`.
+- MUST-110: if both `psdt` and `psdt_hash` are present, `psdt_hash` MUST be SHA-256 of the decoded PSDT bytes (Section 3.4).
 
 ### 13.2 list
 
@@ -1629,7 +1671,7 @@ Any op failing a MUST rule is invalid.
 
 When multiple MUST rules fail, implementations SHOULD report the first failing rule in this priority:
 
-1. Universal envelope rules (MUST-001 through MUST-008, MUST-102, MUST-103)
+1. Universal envelope rules (MUST-001 through MUST-008, MUST-102, MUST-103, MUST-109, MUST-110)
 2. Ownership and UTXO-control rules (MUST-011, MUST-013, MUST-015, MUST-076)
 3. Operation shape and required-field rules (MUST-010, MUST-020, MUST-040, MUST-050, MUST-060,
    MUST-070, MUST-074, MUST-080–083, MUST-090)

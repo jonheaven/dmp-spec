@@ -12,7 +12,7 @@ A ÐMP indexer must:
 
 1. Consume Dogecoin blocks in order via RPC (`getblock`, `getrawtransaction`).
 2. For each transaction, parse all Dogenals inscriptions from `script_sig` of the first input.
-3. Filter `p = "dmp"` and supported `v` (`"1.0"` or `"1.0"`).
+3. Filter `p = "Ð:MP"` (legacy `"dmp"` MAY be accepted) and supported `v` (`"1.0"`, or omit → `"1.0"`).
 4. **Process inputs before outputs** in every transaction: apply UTXO-spend invalidations before
    ingesting new ÐMP intents from outputs in the same tx.
 5. Validate op-specific MUST rules from SPEC.md Section 13.
@@ -73,6 +73,16 @@ UTXO state and resolves the controlling address from the output's `script_pubkey
 
 This is the same address-match model used by wonky-dogeord and other Dogenals indexers for
 ownership tracking.
+
+### 3.1 Listing PSDT size (Dogecoin P2PKH)
+
+A listing PSDT is one seller input + one (or few) seller/fee outputs. Bytes explode because Dogecoin
+legacy inputs carry `nonWitnessUtxo` = the **entire previous transaction**. A P2SH reveal parent can
+make `psdt` several kilobytes. Compact JSON keys (`lm`) do not fix that.
+
+- Prefer embedding `psdt` so any venue can Buy Now from chain data.
+- If the parent is fat, move the dog to a skinny child UTXO, then list.
+- `psdt_hash` without `psdt` is a valid intent but **not** portable fill.
 
 ---
 

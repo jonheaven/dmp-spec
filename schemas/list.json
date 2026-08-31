@@ -10,7 +10,7 @@
     },
     "v": {
       "const": "1.0",
-      "description": "Protocol version"
+      "description": "Protocol version (optional; default 1.0)"
     },
     "op": {
       "const": "list",
@@ -28,7 +28,7 @@
     },
     "currency": {
       "const": "DOGE",
-      "description": "Currency (currently only DOGE supported)"
+      "description": "Optional; default DOGE. Must be DOGE if present."
     },
     "seller": {
       "type": "string",
@@ -36,11 +36,21 @@
     },
     "psdt": {
       "type": "string",
-      "description": "Optional PSBT data for settlement (base64 encoded)"
+      "description": "Seller listing PSDT (base64). Preferred for portable Buy Now."
+    },
+    "psdt_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of raw PSDT bytes (not the base64 string). Hash-only lists are not chain-alone fillable."
     },
     "expiry": {
       "type": "integer",
       "description": "Optional expiry timestamp (Unix epoch seconds)"
+    },
+    "listing_type": {
+      "type": "string",
+      "enum": ["fixed_price", "auction"],
+      "description": "Optional; default fixed_price"
     },
     "chain": {
       "const": "dogecoin",
@@ -72,9 +82,9 @@
     },
     "listing_marketplace": {
       "type": "string",
-      "description": "Optional listing venue id/domain (e.g. dogenals.com)"
+      "description": "Optional listing venue label/domain — not a payee"
     }
   },
-  "required": ["p", "v", "op", "inscription_id", "price", "currency", "seller"],
+  "required": ["p", "op", "inscription_id", "price", "seller"],
   "additionalProperties": true
 }

@@ -4,6 +4,8 @@
 
 ÐMP is the on-chain *record* of market intent: listings, auctions, bids, offers, settlements, transfers, and collection governance. Any indexer with a full node can *verify* those intents against UTXO movement; no venue’s API is the truth.
 
+The **seller-signed PSDT** is the fill contract (Satoshi). The **inscription envelope** is the pointer Casey-style indexers already scan. Do not inscribe implied facts (`currency`, `chain`, default `listing_type`). Pay listing venues with `listing_fee_address`, not a domain string. All ops remain.
+
 | | |
 | ---: | --- |
 | **Version** | v1.0+ · v1.0 [additive `parent_inscription_id`](spec.md#v13-2026-04-25) |
@@ -131,14 +133,11 @@ A ÐMP `list` inscription:
 ```json
 {
   "p": "Ð:MP",
-  "v": "1.0",
   "op": "list",
-  "inscription_id": "abc123...i0",
+  "inscription_id": "<txid>i0",
   "seller": "DLfZ6VN5k7EyqjkqXZzd6mh6nQQZL1262b",
-  "price": 100000000,
-  "currency": "DOGE",
-  "list_id": "list_20260401_abc123",
-  "ts": 1743465600
+  "price": "100000000",
+  "psdt": "cHNidP8B..."
 }
 ```
 

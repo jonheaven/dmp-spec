@@ -214,14 +214,15 @@ def validate_envelope(
         _add(issues, "warning", "SIZE-SOFT-LIMIT",
              "Inscription exceeds 4 KB soft guideline for DMP v1.0.")
 
-    for field_name in ("p", "v", "op"):
+    for field_name in ("p", "op"):
         if field_name not in payload:
             _add(issues, "error", "MUST-BASE", f"Missing required top-level field: {field_name!r}")
 
-    if payload.get("p") != "dmp":
-        _add(issues, "error", "MUST-001", 'p must equal "dmp".')
+    p = payload.get("p")
+    if p not in ("Ð:MP", "dmp"):
+        _add(issues, "error", "MUST-001", 'p must equal "Ð:MP".')
 
-    v = payload.get("v")
+    v = payload.get("v", "1.0")
     if v not in SUPPORTED_VERSIONS:
         _add(issues, "error", "MUST-002",
              f"v {v!r} not recognized. Supported: {sorted(SUPPORTED_VERSIONS)}.")
@@ -594,6 +595,17 @@ TEST_VECTORS: List[Dict[str, Any]] = [
             "price": "100000000",
             "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
             "chain": "dogecoin", "ts": 1700000000,
+        },
+    },
+    {
+        "id": "TV-001b",
+        "desc": "Valid lean list (MUST-109 defaults: no v/currency/chain)",
+        "expect": "pass",
+        "payload": {
+            "p": "Ð:MP", "op": "list",
+            "inscription_id": "aaaa" * 16 + "i0",
+            "price": "100000000",
+            "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
         },
     },
     {

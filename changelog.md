@@ -17,6 +17,20 @@ Future changes after public launch should be tracked here with clear versioning 
 
 ## Draft updates (pre-launch)
 
+### 2026-08-30 — Satoshi + Casey wire reboot
+
+The fill template is the contract (`SIGHASH_SINGLE | ANYONECANPAY` seller PSDT). The inscription is a pointer
+and ownership proof. **Every op stays** (`list`, `bid`, `auction`, `offer`, negotiation, `cancel`, `settle`,
+collections). This is not a protocol shrink.
+
+- Implied fields MAY be omitted: `currency` = DOGE, `chain` = `dogecoin`, `v` = `1.0`, `listing_type` =
+  `fixed_price` (MUST-109).
+- `listing_fee_address` + `market_fee_bps` are how a listing venue is paid. `listing_marketplace` is a tag.
+- `psdt` SHOULD be on-chain for portable Buy Now. `psdt_hash` is allowed when the parent tx is fat (MUST-110).
+  Hash-only lists are not chain-alone fillable.
+- Do not compact-rename remaining keys (`lm`). Fat bytes are `nonWitnessUtxo` on Dogecoin P2PKH, not JSON labels.
+- `list` still does **not** spend the listed dog. The example comment that said otherwise was wrong.
+
 ### 2026-08-05 — Collaborative marketplace fees
 
 - [collaborative-fees.md](collaborative-fees.md): multi-venue rake (listing + settlement) + royalty split physics.
@@ -41,5 +55,5 @@ Future changes after public launch should be tracked here with clear versioning 
   from the best chain.
 - **§15.3–§15.4**: settlement reference, cancel, and timestamp edge cases.
 - **§10**: removed duplicate immutable-field bullet.
-- **Design record**: the pre-launch hardening patch is integrated; normative
-  text is in this spec.
+- **Design record**: [`specs/dmp-hardening-patch.md`](../../specs/dmp-hardening-patch.md) (integrated; normative
+  text is in this spec).
