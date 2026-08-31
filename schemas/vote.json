@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/vote",
+  "title": "ÐMP vote operation",
+  "description": "DAO governance receipt. sig must verify to the collection's DAO authority address.",
+  "type": "object",
+  "required": ["p", "v", "op", "collection_id", "result", "vote_start", "vote_end"],
+  "additionalProperties": true,
+  "properties": {
+    "p":              { "const": "Ð:MP" },
+    "v":              { "const": "1.0" },
+    "op":             { "const": "vote" },
+    "collection_id":  { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "proposal":       { "type": "string" },
+    "vote_type":      { "type": "string" },
+    "result":         { "enum": ["approved", "rejected"] },
+    "votes_for":      { "type": "string", "pattern": "^[0-9]+$" },
+    "votes_against":  { "type": "string", "pattern": "^[0-9]+$" },
+    "votes_abstain":  { "type": "string", "pattern": "^[0-9]+$" },
+    "quorum_bps":     { "type": "string", "pattern": "^[0-9]+$" },
+    "vote_start":     { "type": "integer" },
+    "vote_end":       { "type": "integer" },
+    "sig":            { "type": "string" },
+    "sig_msg":        { "type": "string" },
+    "chain":          { "const": "dogecoin" },
+    "ts":             { "type": "integer" }
+  }
+}

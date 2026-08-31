@@ -1,0 +1,42 @@
+{
+  "_comment": "ÐMP List Operation — Full example with PSDT and royalty",
+  "_doc": "A list op declares the owner's intent to sell inscription_id at price koinu. The op must be inscribed in a transaction that spends the UTXO holding inscription_id (proving seller controls the asset). The psdt field is an unsigned or partially-signed PSDT that any buyer can complete atomically.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "list",
+
+  "inscription_id": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4i0",
+
+  "price": "50000000000000",
+  "_price_note": "500,000 DOGE expressed in koinu (1 DOGE = 100,000,000 koinu). Always a string to avoid floating-point precision loss.",
+
+  "currency": "DOGE",
+
+  "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+
+  "royalty_address": "DNHLLgALJhMxWqkRDH7MjVtPrCrK",
+  "royalty_bps": "500",
+  "_royalty_note": "500 bps = 5% royalty. Max allowed is 1000 bps (10%). Royalty is paid by buyer on top of price, or split from price — marketplace convention applies.",
+
+  "collection_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_collection_note": "Optional. Links this listing to the collection manifest for display purposes.",
+
+  "expiry": 1800000000,
+  "_expiry_note": "Unix timestamp. Indexers treat this listing as expired after this time even if UTXO is unspent.",
+
+  "psdt": "cHNidP8BAH0CAAAAA...(full base64-encoded PSDT here)...",
+  "_psdt_note": "Partially Signed Dogecoin Transaction. The seller has signed their input (the inscription UTXO). A buyer completes it by adding their payment input and broadcasting. Omit this field for OTC/manual settlement flows.",
+
+  "chain": "dogecoin",
+  "ts": 1700001000,
+
+  "_indexer_checks": [
+    "Verify inscription_id exists on-chain",
+    "Verify the list tx spent the UTXO holding inscription_id",
+    "Verify seller is the address that held inscription_id at list time",
+    "Check expiry — mark expired if current time > expiry",
+    "Monitor inscription_id UTXO — auto-invalidate when spent",
+    "If a newer list op exists for the same inscription_id, supersede this one"
+  ]
+}

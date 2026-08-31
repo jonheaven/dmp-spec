@@ -1,0 +1,54 @@
+{
+  "protocol": "ÐMP DogeTag Offers",
+  "marker": "Ð:𝕏",
+  "marker_hex": "c3903af09d958f",
+  "fallback_marker": "Ð:X",
+  "fallback_marker_hex": "c3903a58",
+  "version": 1,
+  "vectors": [
+    {
+      "name": "buy-offer-inscription-sound",
+      "description": "A buy-interest signal for an inscription with full ÐMP offer intended and sound hint enabled.",
+      "payload_hex": "c3903af09d958f0101030100112233445566778899aabbccddeeff00ba1dd2050000006027000039300000",
+      "payload_length": 43,
+      "decoded": {
+        "marker": "Ð:𝕏",
+        "version": 1,
+        "kind": "buy_offer",
+        "flags": {
+          "full_dmp_offer_intended": true,
+          "sound_hint": true,
+          "dogewhisper_link": false
+        },
+        "asset_type": "inscription",
+        "asset_hash16": "00112233445566778899aabbccddeeff",
+        "price_koinu": "25000000000",
+        "expiry_height_delta": 10080,
+        "nonce": 12345,
+        "attention_amount_koinu": "1000000"
+      }
+    },
+    {
+      "name": "buy-offer-collection-with-dogewhisper",
+      "description": "A collection-targeted ÐMP DogeTag Offer using the `Ð:X` fallback marker with encrypted Ðignal context available.",
+      "payload_hex": "c3903a5801010502102030405060708090a0b0c0d0e0f00000e40b54020000008007000010000000",
+      "payload_length": 40,
+      "decoded": {
+        "marker": "Ð:X",
+        "version": 1,
+        "kind": "buy_offer",
+        "flags": {
+          "full_dmp_offer_intended": true,
+          "sound_hint": false,
+          "dogewhisper_link": true
+        },
+        "asset_type": "collection",
+        "asset_hash16": "102030405060708090a0b0c0d0e0f000",
+        "price_koinu": "10000000000",
+        "expiry_height_delta": 1920,
+        "nonce": 16,
+        "attention_amount_koinu": "5000000"
+      }
+    }
+  ]
+}

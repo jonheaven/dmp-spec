@@ -1,0 +1,58 @@
+{
+  "_comment": "ÐMP Settle Operation — Fixed-Price Settlement with Platform Fee",
+  "_doc": "Demonstrates a v1.0 settle that includes the platform_fee field introduced in v1.0. A marketplace emits this settle to record both the sale and their fee collection. The platform_fee must appear as an actual output in the settlement_txid for the indexer to consider it valid.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "settle",
+
+  "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
+  "list_id": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1i0",
+  "bid_id": "c0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffi0",
+  "_bid_id_note": "Optional for fixed-price listings. Include when buyer submitted a bid op before settlement.",
+
+  "seller": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+  "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+
+  "price": "1250000000",
+  "_price_note": "12.5 DOGE in koinu — the listed price. Must match the list op's price field.",
+  "currency": "DOGE",
+
+  "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+
+  "royalty_paid": "62500000",
+  "_royalty_paid_note": "5% of 12.5 DOGE = 0.625 DOGE in koinu. Must appear as an output in settlement_txid.",
+  "royalty_address": "DNHLLgALJhMxWqnBxJYqkRDH7MjVtPrCrK",
+
+  "platform_fee": "25000000",
+  "_platform_fee_note": "2% marketplace fee = 0.25 DOGE in koinu. New in v1.0. Indexers verify this output exists in settlement_txid. Platform_fee is separate from royalty — both must be present.",
+  "platform_fee_recipient": "DMarketplace1feeaddresshere1111111111",
+  "_platform_fee_recipient_note": "The marketplace's fee collection address. Must match the actual output recipient in settlement_txid.",
+
+  "nonce": "settle-20260424-0001",
+  "_nonce_note": "Optional deduplication field. Prevents replay if the settle is somehow re-submitted. Indexers may use this to reject duplicate settle attempts for the same list_id.",
+
+  "chain": "dogecoin",
+  "ts": 1745500900,
+
+  "_settlement_breakdown": {
+    "sale_price_DOGE": 12.5,
+    "royalty_DOGE": 0.625,
+    "royalty_bps": 500,
+    "platform_fee_DOGE": 0.25,
+    "platform_fee_bps": 200,
+    "seller_receives_DOGE": 11.625,
+    "_note": "seller_receives = price - royalty - platform_fee (if fees are taken from price, not added on top). Marketplace convention applies — ÐMP does not mandate fee deduction model, only that declared amounts appear in the settlement tx."
+  },
+
+  "_indexer_checks": [
+    "Verify list_id references an active list op",
+    "Verify inscription_id matches the listed inscription",
+    "Verify settlement_txid is confirmed at 6+ block depth",
+    "Verify inscription transferred to buyer address in settlement_txid",
+    "Verify seller received >= price in settlement_txid",
+    "Verify royalty output: royalty_address received royalty_paid (matches floor(price * bps / 10000))",
+    "Verify platform_fee output: platform_fee_recipient received platform_fee",
+    "Mark list_id as settled — reject any future settle attempts for the same list_id (MUST-036)"
+  ]
+}

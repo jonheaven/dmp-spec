@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/decline",
+  "title": "ÐMP decline operation",
+  "description": "Seller declines an active offer or counteroffer. Terminal for that negotiation branch.",
+  "type": "object",
+  "required": ["p", "v", "op", "target_op", "target_id", "seller"],
+  "additionalProperties": true,
+  "properties": {
+    "p":              { "const": "Ð:MP" },
+    "v":              { "const": "1.0" },
+    "op":             { "const": "decline" },
+    "target_op":      { "enum": ["offer", "counteroffer"] },
+    "target_id":      { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "seller":         { "type": "string", "minLength": 20 },
+    "decline_reason": { "type": "string" },
+    "chain":          { "const": "dogecoin" },
+    "ts":             { "type": "integer" }
+  }
+}

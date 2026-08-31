@@ -1,0 +1,17 @@
+{
+  "_comment": "ÐMP v1.0 private offer with mandatory offer_fee",
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "offer",
+  "offer_target_type": "inscription",
+  "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
+  "target_seller": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+  "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+  "price": "1250000000",
+  "currency": "DOGE",
+  "offer_fee": "100000000",
+  "fee_recipient": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+  "expiry": 1700010000,
+  "chain": "dogecoin",
+  "ts": 1700000400
+}

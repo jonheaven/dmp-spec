@@ -1,0 +1,42 @@
+{
+  "_comment": "ÐMP Bid Operation — Collection-Level Bid",
+  "_doc": "A collection bid expresses a buyer's intent to purchase ANY inscription that is a valid member of a specific collection, at the stated price. The indexer must match this bid against any active listing for a member inscription. This is distinct from an inscription-specific bid which targets a single inscription_id.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "bid",
+
+  "_target_comment": "This bid targets a collection, not a specific inscription. Omit inscription_id when bidding on a collection.",
+  "collection_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_collection_id_note": "The inscription ID of the collection manifest. Indexers verify that any matched inscription is a valid member per the manifest's criteria field.",
+
+  "bid_id": "f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2d3c4b5a6f1e2i0",
+  "_bid_id_note": "A unique identifier for this bid (the inscription ID of the bid inscription itself). Marketplaces use this to correlate bid with settle.",
+
+  "price": "500000000000",
+  "_price_note": "5,000 DOGE expressed in koinu (1 DOGE = 100,000,000 koinu). Buyer is willing to pay up to this amount for any collection member.",
+
+  "currency": "DOGE",
+
+  "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+  "_buyer_note": "The address making the bid. On settlement, the matched inscription must arrive at this address.",
+
+  "expiry": 1800000000,
+  "_expiry_note": "Unix timestamp. Indexers MUST treat this bid as expired after this time even if no explicit cancel is found.",
+
+  "nonce": "col-bid-20260424-001",
+  "_nonce_note": "Optional. Used by the buyer to prevent bid replay or to disambiguate multiple simultaneous collection bids.",
+
+  "chain": "dogecoin",
+  "ts": 1745500800,
+
+  "_indexer_matching_rules": [
+    "A collection bid matches any active listing for an inscription that is a valid member of collection_id",
+    "Membership is validated against the criteria field of the collection manifest (explicit list or range/prefix rules)",
+    "The settlement price must be >= the listing price AND <= the bid price",
+    "On settlement, inscription must transfer to buyer address",
+    "If multiple listings qualify, the marketplace UI selects one — the bid is settled when any one settles",
+    "After one matching settle, the collection bid is consumed (one-use by default)",
+    "Expiry check: if current_block_time > expiry, bid is invalid"
+  ]
+}

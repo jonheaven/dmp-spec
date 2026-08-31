@@ -1,0 +1,71 @@
+{
+  "_comment": "ÐMP Collection Update — Metadata patch with supersedes chain",
+  "_doc": "A collection-update appends a new record to the collection's update chain. It does NOT delete the original manifest — that remains on-chain permanently. The patch object contains only the fields being changed; all other fields retain their previous values. supersedes must point to the current chain head (the original manifest if this is the first update, or the previous update inscription ID).",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "collection-update",
+
+  "collection_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_collection_id_note": "The inscription ID of the original collection manifest — never changes across updates.",
+
+  "supersedes": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_supersedes_note": "Must equal the current head of the update chain. For the first update, this equals collection_id. For subsequent updates, this equals the previous collection-update inscription ID. Indexers reject updates whose supersedes does not match the known head.",
+
+  "update_of": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_update_of_note": "Always equals collection_id. Redundant with collection_id but provided for indexer convenience — a single field always pointing at the root manifest.",
+
+  "patch": {
+    "_comment": "Only include fields that are actually changing. Omitted fields retain their current values.",
+
+    "description": "10,000 unique pixel art Doge characters — the original Dogecoin PFP collection. Now with verified rarity rankings.",
+    "royalty_bps": "400",
+    "_royalty_note": "Reduced from 500 bps to 400 bps. Cannot exceed original value if supply_locked.",
+    "external_url": "https://dogepunks.example/v2",
+
+    "attributes_schema": [
+      {"name": "Background", "type": "string"},
+      {"name": "Fur",        "type": "string"},
+      {"name": "Eyes",       "type": "string"},
+      {"name": "Mouth",      "type": "string"},
+      {"name": "Accessory",  "type": "string"},
+      {"name": "Rank",       "type": "number"},
+      {"name": "RarityScore","type": "number", "_note": "New attribute added — existing attributes not removed"}
+    ]
+  },
+
+  "_immutable_fields_note": "The following fields cannot be in patch for any fixed collection: slug, type, supply (if supply_locked), creator_address (use key rotation procedure), chain.",
+
+  "_vote_proof_example": {
+    "_comment": "This field is ONLY required when requires_vote: true is set on the original manifest. Omit entirely if requires_vote is false.",
+    "vote_inscription_id": "9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8bi0",
+    "vote_result": "approved",
+    "vote_sig": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+  },
+
+  "chain": "dogecoin",
+  "ts": 1701000000,
+
+  "sig_msg": "7b2270223a22646d70222c226f70223a22636f6c6c656374696f6e2d757064617465222c22636f6c6c656374696f6e5f6964223a22...",
+  "sig": "2048596a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d",
+
+  "_update_chain_diagram": [
+    "collection (a1b2...i0)  <-- original manifest, never changes",
+    "  |",
+    "  v superseded by",
+    "collection-update (this inscription)  <-- current head",
+    "  |",
+    "  v will be superseded by",
+    "collection-update (future update, if needed)"
+  ],
+
+  "_indexer_checks": [
+    "Verify collection_id references an existing collection manifest",
+    "Verify supersedes equals the current chain head for collection_id",
+    "Verify sig is valid for creator_address in the current manifest",
+    "Verify patch does not modify any immutable fields",
+    "If requires_vote is true on original manifest: verify vote_proof is present and valid",
+    "Apply patch fields on top of current manifest state to compute new state",
+    "Mark this inscription as the new chain head"
+  ]
+}

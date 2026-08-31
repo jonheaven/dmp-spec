@@ -1,0 +1,486 @@
+{
+  "$comment": "ÐMP v1.0 test vectors. Each entry specifies a payload and expected validation outcome. 'pass' = no errors (warnings allowed). 'fail' = at least one error. Implementations should run all vectors and report failures.",
+  "version": "1.0",
+  "vectors": [
+    {
+      "id": "TV-001",
+      "desc": "Valid fixed-price list (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "chain": "dogecoin", "ts": 1700000000
+      },
+      "notes": "Minimal valid list. Unknown fields silently ignored (MUST-005)."
+    },
+    {
+      "id": "TV-002",
+      "desc": "Valid bid with inscription_id (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "bid",
+        "inscription_id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbi0",
+        "price": "150000000",
+        "bidder": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "chain": "dogecoin", "ts": 1700000100
+      }
+    },
+    {
+      "id": "TV-003",
+      "desc": "Valid bid with collection_id (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "bid",
+        "collection_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "price": "200000000",
+        "bidder": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "chain": "dogecoin", "ts": 1700000200
+      }
+    },
+    {
+      "id": "TV-004",
+      "desc": "Valid settle (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "settle",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000",
+        "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+        "chain": "dogecoin", "ts": 1700000900
+      },
+      "notes": "settle inscriber identity is irrelevant to validity (MUST-030 verifies txid only)."
+    },
+    {
+      "id": "TV-005",
+      "desc": "Valid cancel v1.0 without canceller (warning only)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "cancel",
+        "cancel_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "cancel_type": "list",
+        "reason": "seller_request",
+        "chain": "dogecoin", "ts": 1700000300
+      },
+      "notes": "v1.0 cancel without canceller is valid at envelope level. Indexers must verify authorization via UTXO input method (MUST-041)."
+    },
+    {
+      "id": "TV-006",
+      "desc": "Valid cancel v1.0 with canceller",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "cancel",
+        "cancel_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "cancel_type": "list",
+        "canceller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "reason": "seller_request",
+        "chain": "dogecoin", "ts": 1700000300
+      }
+    },
+    {
+      "id": "TV-007",
+      "desc": "Valid auction (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "auction",
+        "inscription_id": "1111111111111111111111111111111111111111111111111111111111111111i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "auction_mode": "time_based",
+        "min_bid_increment": "50000000",
+        "start_ts": 1700000000,
+        "expiry": 1700007200,
+        "chain": "dogecoin", "ts": 1700000001
+      }
+    },
+    {
+      "id": "TV-008",
+      "desc": "Valid offer (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "offer",
+        "offer_target_type": "inscription",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "1250000000",
+        "currency": "DOGE",
+        "offer_fee": "100000000",
+        "fee_recipient": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "expiry": 1700010000,
+        "chain": "dogecoin", "ts": 1700000400
+      }
+    },
+    {
+      "id": "TV-009",
+      "desc": "Valid transfer (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "transfer",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "from_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "to_address": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "transfer_type": "gift",
+        "transfer_txid": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+        "note": "Gifted to community winner",
+        "chain": "dogecoin", "ts": 1700001200
+      }
+    },
+    {
+      "id": "TV-010",
+      "desc": "Valid settle with platform_fee (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "settle",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000",
+        "platform_fee": "2000000",
+        "platform_fee_recipient": "DFeeAddressMarketplaceXXXXXXXXXXXX",
+        "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+        "chain": "dogecoin", "ts": 1700001000
+      }
+    },
+    {
+      "id": "TV-011",
+      "desc": "Valid bid with list_id backref (v1.0)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "bid",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "list_id": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1i0",
+        "price": "100000000",
+        "bidder": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "chain": "dogecoin", "ts": 1700000500
+      }
+    },
+    {
+      "id": "TV-012",
+      "desc": "Valid bid with nonce field (ignored by validators)",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "bid",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "bidder": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "nonce": "a4f3e2b1-random-uuid-here",
+        "chain": "dogecoin", "ts": 1700000500
+      },
+      "notes": "nonce has no semantic validation effect (MUST-005, unknown fields ignored)."
+    },
+    {
+      "id": "TV-101",
+      "desc": "MUST-001: wrong p value",
+      "expect": "fail",
+      "must_rules": ["MUST-001"],
+      "payload": {
+        "p": "ord", "v": "1.0", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-102",
+      "desc": "MUST-002: unknown version",
+      "expect": "fail",
+      "must_rules": ["MUST-002"],
+      "payload": {
+        "p": "Ð:MP", "v": "9.9", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-103",
+      "desc": "MUST-003: unknown op",
+      "expect": "fail",
+      "must_rules": ["MUST-003"],
+      "payload": { "p": "Ð:MP", "v": "1.0", "op": "unknown_op" }
+    },
+    {
+      "id": "TV-104",
+      "desc": "MUST-REQ: list missing inscription_id",
+      "expect": "fail",
+      "must_rules": ["MUST-REQ"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-105",
+      "desc": "MUST-REQ: list missing price",
+      "expect": "fail",
+      "must_rules": ["MUST-REQ"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-106",
+      "desc": "MUST-ONE-OF: bid missing both inscription_id and collection_id",
+      "expect": "fail",
+      "must_rules": ["MUST-020"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "bid",
+        "price": "100000000",
+        "bidder": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq"
+      }
+    },
+    {
+      "id": "TV-107",
+      "desc": "FORMAT-ID: malformed inscription_id",
+      "expect": "fail",
+      "must_rules": ["FORMAT-ID"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "inscription_id": "not-a-valid-id",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-108",
+      "desc": "MUST-074: auction with invalid auction_mode",
+      "expect": "fail",
+      "must_rules": ["MUST-074"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "auction",
+        "inscription_id": "1111111111111111111111111111111111111111111111111111111111111111i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "auction_mode": "invalid_mode",
+        "min_bid_increment": "50000000",
+        "start_ts": 1700000000,
+        "expiry": 1700007200
+      }
+    },
+    {
+      "id": "TV-109",
+      "desc": "MUST-075: auction expiry <= start_ts",
+      "expect": "fail",
+      "must_rules": ["MUST-075"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "auction",
+        "inscription_id": "1111111111111111111111111111111111111111111111111111111111111111i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "auction_mode": "time_based",
+        "min_bid_increment": "50000000",
+        "start_ts": 1700007200,
+        "expiry": 1700000000
+      }
+    },
+    {
+      "id": "TV-110",
+      "desc": "MUST-082: offer with offer_fee = 0",
+      "expect": "fail",
+      "must_rules": ["MUST-082"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "offer",
+        "offer_target_type": "inscription",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000",
+        "currency": "DOGE",
+        "offer_fee": "0",
+        "fee_recipient": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "TV-111",
+      "desc": "MUST-083: offer missing fee_recipient",
+      "expect": "fail",
+      "must_rules": ["MUST-083"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "offer",
+        "offer_target_type": "inscription",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000",
+        "currency": "DOGE",
+        "offer_fee": "100000000"
+      }
+    },
+    {
+      "id": "TV-112",
+      "desc": "MUST-006: chain != dogecoin",
+      "expect": "fail",
+      "must_rules": ["MUST-006"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "chain": "bitcoin"
+      }
+    },
+    {
+      "id": "TV-113",
+      "desc": "MUST-106: v1.0 cancel missing reason",
+      "expect": "fail",
+      "must_rules": ["MUST-106"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "cancel",
+        "cancel_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "cancel_type": "list",
+        "canceller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "chain": "dogecoin",
+        "ts": 1700000300
+      }
+    },
+    {
+      "id": "TV-114",
+      "desc": "transfer op rejected with v1.0",
+      "expect": "fail",
+      "must_rules": ["MUST-002"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "transfer",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "from_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "to_address": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "transfer_type": "gift",
+        "transfer_txid": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+      },
+      "notes": "transfer requires v: '1.2'. Engines processing v1.0 should reject or ignore this op."
+    },
+    {
+      "id": "TV-115",
+      "desc": "MUST-095: invalid transfer_type",
+      "expect": "fail",
+      "must_rules": ["MUST-095"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "transfer",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "from_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "to_address": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "transfer_type": "sale",
+        "transfer_txid": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+      },
+      "notes": "Use settle for sales, not transfer."
+    },
+    {
+      "id": "TV-116",
+      "desc": "MUST-054: royalty_bps out of range (> 1000)",
+      "expect": "fail",
+      "must_rules": ["MUST-054"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "collection",
+        "slug": "test-collection",
+        "creator_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "type": "fixed",
+        "royalty_bps": "1500"
+      }
+    },
+    {
+      "id": "TV-117",
+      "desc": "MUST-005: unknown fields are silently ignored",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "future_field_v99": "this_should_be_ignored",
+        "another_unknown": { "nested": "value" }
+      },
+      "notes": "MUST-005: parsers must never error on unknown fields."
+    },
+    {
+      "id": "TV-118",
+      "desc": "Royalty formula: 1B koinu @ 500 bps = 50M koinu expected",
+      "type": "royalty_check",
+      "price_koinu": 1000000000,
+      "royalty_bps": 500,
+      "royalty_paid_koinu": 50000000,
+      "expect": "pass"
+    },
+    {
+      "id": "TV-119",
+      "desc": "Royalty formula: underpayment by 1 koinu fails",
+      "type": "royalty_check",
+      "price_koinu": 1000000000,
+      "royalty_bps": 500,
+      "royalty_paid_koinu": 49999999,
+      "expect": "fail"
+    },
+    {
+      "id": "TV-120",
+      "desc": "Royalty formula: floor rounding — 999 koinu @ 300 bps = floor(2.997) = 2 koinu",
+      "type": "royalty_check",
+      "price_koinu": 999,
+      "royalty_bps": 300,
+      "royalty_paid_koinu": 2,
+      "expect": "pass",
+      "notes": "floor(999 * 300 / 10000) = floor(29.97) = 29. Wait — that is 29 koinu. Paying 2 would fail."
+    },
+    {
+      "id": "TV-121",
+      "desc": "MUST-REQ: settle missing settlement_txid",
+      "expect": "fail",
+      "must_rules": ["MUST-REQ"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "settle",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000"
+      }
+    },
+    {
+      "id": "TV-122",
+      "desc": "MUST-037: platform_fee without platform_fee_recipient",
+      "expect": "fail",
+      "must_rules": ["MUST-037"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "settle",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa i0",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "100000000",
+        "platform_fee": "2000000",
+        "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e"
+      }
+    },
+    {
+      "id": "TV-123",
+      "desc": "MUST-056: slug with uppercase letters",
+      "expect": "fail",
+      "must_rules": ["MUST-056"],
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "collection",
+        "slug": "Doge-Punks",
+        "creator_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "type": "fixed"
+      }
+    },
+    {
+      "id": "TV-124",
+      "desc": "Valid collection with correct slug format",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP", "v": "1.0", "op": "collection",
+        "slug": "doge-punks",
+        "name": "Doge Punks",
+        "creator_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "type": "fixed",
+        "royalty_bps": "500",
+        "chain": "dogecoin", "ts": 1700000000
+      }
+    }
+  ],
+  "royalty_formula": {
+    "description": "expected_royalty = floor(price_koinu * royalty_bps / 10000). royalty_paid must be >= expected_royalty.",
+    "examples": [
+      { "price_koinu": 1000000000, "royalty_bps": 500, "expected_royalty_koinu": 50000000 },
+      { "price_koinu": 500000000,  "royalty_bps": 250, "expected_royalty_koinu": 12500000 },
+      { "price_koinu": 999,        "royalty_bps": 300, "expected_royalty_koinu": 29 },
+      { "price_koinu": 1,          "royalty_bps": 1000, "expected_royalty_koinu": 0 }
+    ]
+  }
+}

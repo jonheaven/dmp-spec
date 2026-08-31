@@ -1,0 +1,62 @@
+{
+  "_comment": "ÐMP Collection Manifest — Dynamic Supply (type: dynamic, criteria: rule_based)",
+  "_doc": "This is the canonical form for an ever-expanding collection like DogeMaps DNS registrations. No supply cap is set. Membership is determined by evaluating rules against each inscription's metadata — any indexer can independently verify membership without a signed update from the creator.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "collection",
+
+  "slug": "dogemap-domains",
+  "name": "DogeMaps Domains",
+  "description": "Every .doge domain name registered through the DogeMaps on-chain DNS protocol. An open, ever-expanding registry — new domains are added automatically as they are registered.",
+  "image": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1i0",
+  "external_url": "https://dogemap.example",
+
+  "creator_address": "DQkwDyDJqbaxvQLPLMKoiVeRMnwKNEaKCq",
+  "creator_name": "DogeMaps Protocol",
+  "royalty_address": "DQkwDyDJqbaxvQLPLMKoiVeRMnwKNEaKCq",
+  "royalty_bps": "200",
+
+  "type": "dynamic",
+
+  "criteria": {
+    "mode": "rule_based",
+    "_comment": "All three rules must match (AND logic). Any inscription satisfying all rules is automatically a member — no creator signature needed per-item.",
+    "rules": [
+      {
+        "field": "content_type",
+        "op": "eq",
+        "value": "application/json",
+        "_note": "Only JSON inscriptions qualify."
+      },
+      {
+        "field": "meta.p",
+        "op": "eq",
+        "value": "dogemap",
+        "_note": "The inscription's JSON body must have p:dogemap."
+      },
+      {
+        "field": "meta.op",
+        "op": "eq",
+        "value": "reg",
+        "_note": "Only domain registration ops count — not updates or transfers."
+      }
+    ],
+    "rule_logic": "AND"
+  },
+
+  "attributes_schema": [
+    {"name": "domain",        "type": "string", "_note": "e.g. shibainu"},
+    {"name": "tld",           "type": "string", "_note": "e.g. .doge"},
+    {"name": "registered_at", "type": "number", "_note": "Unix timestamp of registration inscription"}
+  ],
+
+  "requires_vote": false,
+
+  "chain": "dogecoin",
+  "ts": 1700000000,
+
+  "_signing_note": "Same signing procedure as fixed manifests. sig covers canonical JSON of all fields except sig/sig_msg.",
+  "sig_msg": "7b2270223a22646d70222c226f70223a22636f6c6c656374696f6e222c22636861696e223a22646f6765636f696e222c226372656174...",
+  "sig": "204b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f"
+}

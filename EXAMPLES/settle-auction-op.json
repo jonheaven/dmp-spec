@@ -1,0 +1,51 @@
+{
+  "_comment": "ÐMP Settle Operation — Auction Settlement",
+  "_doc": "An auction settle records the completion of an auction. The winning bid is identified by bid_id. For time_based auctions, the settle MUST be inscribed after the auction's expiry block; for seller_can_accept_early auctions, it may be inscribed anytime after the winning bid. The settlement_txid refers to the on-chain transaction that transferred the inscription to the buyer and paid the seller.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "settle",
+
+  "inscription_id": "c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4i0",
+  "_inscription_id_note": "The Doginal being settled.",
+
+  "auction_id": "e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6i0",
+  "_auction_id_note": "The inscription ID of the auction op that created this auction.",
+
+  "bid_id": "d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5i0",
+  "_bid_id_note": "The inscription ID of the winning bid inscription.",
+
+  "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+  "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+
+  "final_price": "750000000000",
+  "_price_note": "The actual settled price (the winning bid amount): 7,500 DOGE in koinu. This is the bid amount the buyer committed to, which the seller accepted.",
+  "currency": "DOGE",
+
+  "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+  "_settlement_txid_note": "The on-chain transaction where inscription moved to buyer AND seller received final_price. Indexers must verify this transaction at 6+ block confirmation depth.",
+
+  "royalty_paid": "37500000000",
+  "_royalty_paid_note": "5% of final_price (500 bps). Indexer verifies this output exists in settlement_txid.",
+  "royalty_recipient": "DNHLLgALJhMxWqnBxJYqkRDH7MjVtPrCrK",
+
+  "platform_fee": "15000000000",
+  "_platform_fee_note": "2% marketplace fee (200 bps of final_price). Declared by the marketplace emitting this settle.",
+  "platform_fee_recipient": "DMarketplace1feeaddresshere1111111111",
+
+  "chain": "dogecoin",
+  "ts": 1745504400,
+
+  "_auction_settle_rules": [
+    "MUST reference a valid auction_id that is in auction_live or expired state",
+    "For mode=time_based: settle block height MUST be >= auction expiry block",
+    "For mode=seller_can_accept_early: settle may occur before expiry",
+    "For mode=no_early_accept: settle MUST NOT occur before expiry (INVALID if early)",
+    "winning bid_id MUST be the highest valid bid at time of expiry (for time_based)",
+    "settlement_txid MUST show inscription transferred to buyer address",
+    "settlement_txid MUST show seller received >= final_price in same tx",
+    "royalty_paid MUST match formula: floor(final_price * royalty_bps / 10000)",
+    "platform_fee is optional but if declared, output must exist in settlement_txid",
+    "6+ block confirmation depth required before indexer processes settle (MUST-030)"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/settle",
+  "title": "ÐMP settle operation",
+  "description": "Records a completed on-chain settlement. Anyone may inscribe. Validity depends entirely on settlement_txid verification.",
+  "type": "object",
+  "required": ["p", "v", "op", "inscription_id", "seller", "buyer", "price", "settlement_txid"],
+  "additionalProperties": true,
+  "properties": {
+    "p":                      { "const": "Ð:MP" },
+    "v":                      { "const": "1.0" },
+    "op":                     { "const": "settle" },
+    "inscription_id":         { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "list_id":                { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "bid_id":                 { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "auction_id":             { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "seller":                 { "type": "string", "minLength": 20 },
+    "buyer":                  { "type": "string", "minLength": 20 },
+    "price":                  { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "royalty_paid":           { "type": "string", "pattern": "^[0-9]+$" },
+    "royalty_address":        { "type": "string", "minLength": 20 },
+    "platform_fee":           { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "platform_fee_recipient": { "type": "string", "minLength": 20 },
+    "settlement_txid":        { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "chain":                  { "const": "dogecoin" },
+    "ts":                     { "type": "integer" }
+  },
+  "if": {
+    "required": ["platform_fee"]
+  },
+  "then": {
+    "required": ["platform_fee_recipient"]
+  }
+}

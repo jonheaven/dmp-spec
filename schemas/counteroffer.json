@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/counteroffer",
+  "title": "ÐMP counteroffer operation",
+  "description": "Seller response to an active offer. Only the current UTXO owner may issue.",
+  "type": "object",
+  "required": ["p", "v", "op", "offer_id", "seller", "counter_price", "currency"],
+  "additionalProperties": true,
+  "properties": {
+    "p":             { "const": "Ð:MP" },
+    "v":             { "const": "1.0" },
+    "op":            { "const": "counteroffer" },
+    "offer_id":      { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "seller":        { "type": "string", "minLength": 20 },
+    "counter_price": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "currency":      { "type": "string" },
+    "expiry":        { "type": "integer" },
+    "psdt":          { "type": "string" },
+    "chain":         { "const": "dogecoin" },
+    "ts":            { "type": "integer" }
+  }
+}

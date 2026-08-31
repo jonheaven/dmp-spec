@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogenals.org/schemas/dmp-offer-signal-decoded.json",
+  "title": "ÐMP DogeTag Offer Decoded Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "marker",
+    "version",
+    "kind",
+    "flags",
+    "asset_type",
+    "asset_hash16",
+    "price_koinu",
+    "expiry_height_delta",
+    "nonce",
+    "attention_amount_koinu"
+  ],
+  "properties": {
+    "marker": {
+      "enum": ["Ð:𝕏", "Ð:X"]
+    },
+    "version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "buy_offer"
+    },
+    "flags": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["full_dmp_offer_intended", "sound_hint", "dogewhisper_link"],
+      "properties": {
+        "full_dmp_offer_intended": {
+          "type": "boolean"
+        },
+        "sound_hint": {
+          "type": "boolean"
+        },
+        "dogewhisper_link": {
+          "type": "boolean"
+        }
+      }
+    },
+    "asset_type": {
+      "enum": ["inscription", "collection"]
+    },
+    "asset_hash16": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "price_koinu": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "expiry_height_delta": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 43200
+    },
+    "nonce": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "attention_amount_koinu": {
+      "type": "string",
+      "pattern": "^[0-9]+$"
+    },
+    "tag_txid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

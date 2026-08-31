@@ -1,0 +1,59 @@
+{
+  "_comment": "ÐMP Vote Operation — DAO governance vote receipt for a collection-update proposal",
+  "_doc": "A vote op is inscribed by the DAO operator to record the result of a community governance vote on a proposed collection change. It is only relevant for collections that set requires_vote: true in their manifest. The vote op inscription ID is referenced by a subsequent collection-update via vote_proof.vote_inscription_id.",
+
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "vote",
+
+  "collection_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "_collection_id_note": "The inscription ID of the collection manifest this vote applies to. The collection must have requires_vote: true.",
+
+  "proposal": "Reduce royalty from 500 bps to 300 bps and update external_url to https://dogepunks.example/v2.",
+  "_proposal_note": "Human-readable description of the proposed change. Should match the patch in the subsequent collection-update.",
+
+  "vote_type": "collection-update",
+  "_vote_type_note": "In v1.0, only 'collection-update' is defined. Future versions may add op types.",
+
+  "result": "approved",
+  "_result_note": "Either 'approved' or 'rejected'. If 'rejected', no collection-update may reference this vote_inscription_id as proof.",
+
+  "votes_for": "7500",
+  "votes_against": "1200",
+  "votes_abstain": "300",
+  "_vote_counts_note": "Vote weights are expressed as strings. The unit (e.g., number of tokens, number of holders) is determined by the DAO governance mechanism — ÐMP does not prescribe it.",
+
+  "quorum_bps": "500",
+  "_quorum_note": "Quorum achieved in basis points of total eligible votes. Must meet or exceed dao_quorum_bps from the collection manifest for the vote to be valid. 500 bps = 5% participation.",
+
+  "vote_start": 1700000000,
+  "vote_end":   1700086400,
+  "_timing_note": "Unix timestamps. vote_end must be before the collection-update inscription timestamp for the vote_proof to be accepted by indexers.",
+
+  "sig":     "204b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f",
+  "sig_msg": "7b22636f6c6c656374696f6e5f6964223a22613162326333643465356636613162326333...",
+  "_sig_note": "Signed by the dao_address declared in the collection manifest. Uses the same canonical message construction as manifest signatures (SPEC.md §5.2): sorted-key JSON, remove sig/sig_msg, Dogecoin message prefix, SHA256(SHA256(...)).",
+
+  "chain": "dogecoin",
+  "ts": 1700086400,
+
+  "_how_to_use": [
+    "1. Collection creator sets requires_vote: true and dao_address in the original manifest",
+    "2. Community discusses the proposed change (Discord, forum, etc.)",
+    "3. DAO operator inscribes this vote op to record the result on-chain",
+    "4. If result is 'approved', creator inscribes a collection-update with vote_proof:",
+    "   vote_proof.vote_inscription_id = <this inscription's ID>",
+    "   vote_proof.vote_result = 'approved'",
+    "   vote_proof.vote_sig = <sig by dao_address over this inscription's ID>",
+    "5. Indexers verify the vote_proof before accepting the collection-update"
+  ],
+
+  "_indexer_checks": [
+    "Verify collection_id references a collection with requires_vote: true (MUST-070)",
+    "Verify sig is valid for dao_address from the collection manifest (MUST-071)",
+    "Verify vote_end > vote_start (MUST-072)",
+    "Verify result is 'approved' or 'rejected' (MUST-073)",
+    "Verify quorum_bps >= dao_quorum_bps from the collection manifest",
+    "Store this inscription ID for reference by future collection-update vote_proof"
+  ]
+}

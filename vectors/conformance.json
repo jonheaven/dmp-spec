@@ -1,0 +1,97 @@
+{
+  "$comment": "ÐMP v1.0 conformance entrypoint. This file gives CI and implementers a stable vectors/conformance.json path while preserving existing richer vector sources.",
+  "version": "1.0",
+  "protocol": "dmp",
+  "related_vectors": [
+    "../reference/test_vectors.json",
+    "dmp-offer-signal-vectors.json"
+  ],
+  "vectors": [
+    {
+      "id": "DMP-001",
+      "description": "Valid fixed-price list operation shape",
+      "schema": "schemas/list.json",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP",
+        "v": "1.0",
+        "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaai0",
+        "price": "100000000",
+        "currency": "DOGE",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "chain": "dogecoin",
+        "ts": 1700000000
+      }
+    },
+    {
+      "id": "DMP-002",
+      "description": "Valid private offer operation shape",
+      "schema": "schemas/offer.json",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP",
+        "v": "1.0",
+        "op": "offer",
+        "offer_target_type": "inscription",
+        "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
+        "target_seller": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+        "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+        "price": "1250000000",
+        "currency": "DOGE",
+        "offer_fee": "100000000",
+        "fee_recipient": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+        "expiry": 1700010000,
+        "chain": "dogecoin",
+        "ts": 1700000400
+      }
+    },
+    {
+      "id": "DMP-003",
+      "description": "Reject wrong protocol marker",
+      "schema": "schemas/list.json",
+      "expect": "fail",
+      "expected_reason": "invalid_const: p",
+      "payload": {
+        "p": "Ð:𝕏",
+        "v": "1.0",
+        "op": "list",
+        "inscription_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaai0",
+        "price": "100000000",
+        "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA"
+      }
+    },
+    {
+      "id": "DMP-004",
+      "description": "Valid cancel with reason (v1.0 UTXO path; canceller optional)",
+      "schema": "schemas/cancel.json",
+      "expect": "pass",
+      "payload": {
+        "p": "Ð:MP",
+        "v": "1.0",
+        "op": "cancel",
+        "cancel_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "cancel_type": "list",
+        "reason": "seller_request",
+        "chain": "dogecoin",
+        "ts": 1700000300
+      }
+    },
+    {
+      "id": "DMP-005",
+      "description": "Reject cancel without reason (MUST-106)",
+      "schema": "schemas/cancel.json",
+      "expect": "fail",
+      "payload": {
+        "p": "Ð:MP",
+        "v": "1.0",
+        "op": "cancel",
+        "cancel_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccci0",
+        "cancel_type": "list",
+        "canceller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+        "chain": "dogecoin",
+        "ts": 1700000300
+      }
+    }
+  ]
+}

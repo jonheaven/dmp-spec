@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/transfer",
+  "title": "ÐMP transfer operation",
+  "description": "Explicit non-sale transfer for provenance continuity and gap closure. Requires v: 1.2.",
+  "type": "object",
+  "required": ["p", "v", "op", "inscription_id", "from_address", "to_address", "transfer_type", "transfer_txid"],
+  "additionalProperties": true,
+  "properties": {
+    "p":              { "const": "Ð:MP" },
+    "v":              { "const": "1.0" },
+    "op":             { "const": "transfer" },
+    "inscription_id": { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "from_address":   { "type": "string", "minLength": 20 },
+    "to_address":     { "type": "string", "minLength": 20 },
+    "transfer_type":  { "enum": ["gift", "airdrop", "migration", "burn", "other"] },
+    "note":           { "type": "string", "maxLength": 140 },
+    "transfer_txid":  { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "chain":          { "const": "dogecoin" },
+    "ts":             { "type": "integer" }
+  }
+}

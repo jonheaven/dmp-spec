@@ -1,0 +1,12 @@
+{
+  "_comment": "ÐMP v1.0 seller decline of offer or counteroffer",
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "decline",
+  "target_op": "offer",
+  "target_id": "c0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffi0",
+  "seller": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+  "decline_reason": "price_too_low",
+  "chain": "dogecoin",
+  "ts": 1700000700
+}

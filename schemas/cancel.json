@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/cancel",
+  "title": "ÐMP cancel operation",
+  "description": "Cancels a list, bid, auction, offer, or counteroffer intent. Requires authorization proof.",
+  "type": "object",
+  "required": ["p", "v", "op", "cancel_id", "cancel_type", "reason"],
+  "additionalProperties": true,
+  "properties": {
+    "p":           { "const": "Ð:MP" },
+    "v":           { "const": "1.0" },
+    "op":          { "const": "cancel" },
+    "cancel_id":   { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "cancel_type": { "enum": ["list", "bid", "auction", "offer", "counteroffer"] },
+    "canceller":   { "type": "string", "minLength": 20 },
+    "reason":      { "enum": ["seller_request", "expired", "buyer_breach", "admin_emergency", "other"] },
+    "sig":         { "type": "string" },
+    "chain":       { "const": "dogecoin" },
+    "ts":          { "type": "integer" }
+  }
+}

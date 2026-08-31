@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/collection-update",
+  "title": "ÐMP collection-update operation",
+  "description": "Append-only patch. supersedes must equal current head. sig verifies to creator_address.",
+  "type": "object",
+  "required": ["p", "v", "op", "collection_id", "supersedes", "update_of", "patch"],
+  "additionalProperties": true,
+  "properties": {
+    "p":             { "const": "Ð:MP" },
+    "v":             { "const": "1.0" },
+    "op":            { "const": "collection-update" },
+    "collection_id": { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "supersedes":    { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "update_of":     { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "patch":         { "type": "object" },
+    "vote_proof": {
+      "type": "object",
+      "properties": {
+        "vote_inscription_id": { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+        "vote_result":         { "enum": ["approved", "rejected"] },
+        "vote_sig":            { "type": "string" }
+      },
+      "required": ["vote_inscription_id", "vote_result"]
+    },
+    "sig":     { "type": "string" },
+    "sig_msg": { "type": "string" },
+    "chain":   { "const": "dogecoin" },
+    "ts":      { "type": "integer" }
+  }
+}

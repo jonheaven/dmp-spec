@@ -1,0 +1,16 @@
+{
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "settle",
+  "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
+  "list_id": "f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1i0",
+  "bid_id": "c0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffeec0ffi0",
+  "seller": "D9p4Lk9xvbQ2Dyh4S8vCb9Ly8cY3h8pP1M",
+  "buyer": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+  "price": "1250000000",
+  "royalty_paid": "62500000",
+  "royalty_address": "DNHLLgALJhMxWqnBxJYqkRDH7MjVtPrCrK",
+  "settlement_txid": "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e",
+  "chain": "dogecoin",
+  "ts": 1700000900
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/offer",
+  "title": "ÐMP offer operation",
+  "description": "Private push-style offer. offer_fee required and must be > 0.",
+  "type": "object",
+  "required": ["p", "v", "op", "offer_target_type", "buyer", "price", "currency", "offer_fee", "fee_recipient"],
+  "additionalProperties": true,
+  "properties": {
+    "p":                 { "const": "Ð:MP" },
+    "v":                 { "const": "1.0" },
+    "op":                { "const": "offer" },
+    "offer_target_type": { "enum": ["inscription", "collection"] },
+    "inscription_id":    { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "collection_id":     { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" },
+    "target_seller":     { "type": "string", "minLength": 20 },
+    "buyer":             { "type": "string", "minLength": 20 },
+    "price":             { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "currency":          { "type": "string" },
+    "offer_fee":         { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "fee_recipient":     { "type": "string", "minLength": 20 },
+    "expiry":            { "type": "integer" },
+    "psdt":              { "type": "string" },
+    "chain":             { "const": "dogecoin" },
+    "nonce":             { "type": "string" },
+    "ts":                { "type": "integer" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "offer_target_type": { "const": "inscription" } },
+        "required": ["offer_target_type"]
+      },
+      "then": { "required": ["inscription_id"] }
+    },
+    {
+      "if": {
+        "properties": { "offer_target_type": { "const": "collection" } },
+        "required": ["offer_target_type"]
+      },
+      "then": { "required": ["collection_id"] }
+    }
+  ]
+}

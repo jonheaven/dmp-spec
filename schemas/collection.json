@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "dmp/v1.0/collection",
+  "title": "ÐMP collection operation",
+  "description": "Creator-signed collection manifest. sig must verify to creator_address.",
+  "type": "object",
+  "required": ["p", "v", "op", "slug", "creator_address", "type"],
+  "additionalProperties": true,
+  "properties": {
+    "p":               { "const": "Ð:MP" },
+    "v":               { "const": "1.0" },
+    "op":              { "const": "collection" },
+    "slug":            { "type": "string", "pattern": "^[a-z0-9-]{1,64}$" },
+    "name":            { "type": "string" },
+    "creator_address": { "type": "string", "minLength": 20 },
+    "royalty_address": { "type": "string", "minLength": 20 },
+    "royalty_bps":     { "type": "string", "pattern": "^([0-9]|[1-9][0-9]{1,2}|1000)$" },
+    "type":            { "enum": ["fixed", "dynamic"] },
+    "supply":          { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "supply_locked":   { "type": "boolean" },
+    "allow_burn":      { "type": "boolean" },
+    "criteria": {
+      "type": "object",
+      "properties": {
+        "mode": { "enum": ["explicit", "parent", "range", "creator_signed", "rule_based"] }
+      }
+    },
+    "signed_list": {
+      "type": "object",
+      "properties": {
+        "inscription_ids": { "type": "array", "items": { "type": "string", "pattern": "^[0-9a-f]{64}i[0-9]+$" } },
+        "sig":     { "type": "string" },
+        "sig_msg": { "type": "string" }
+      }
+    },
+    "default_auction_settings": {
+      "type": "object",
+      "properties": {
+        "enabled":           { "type": "boolean" },
+        "auction_mode":      { "enum": ["time_based", "seller_can_accept_early", "no_early_accept"] },
+        "min_bid_increment": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+        "min_offer_fee":     { "type": "string", "pattern": "^[1-9][0-9]*$" }
+      }
+    },
+    "requires_vote": { "type": "boolean" },
+    "sig":     { "type": "string" },
+    "sig_msg": { "type": "string" },
+    "chain":   { "const": "dogecoin" },
+    "ts":      { "type": "integer" }
+  }
+}

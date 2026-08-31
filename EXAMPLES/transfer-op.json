@@ -1,0 +1,13 @@
+{
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "transfer",
+  "inscription_id": "aaaabbbbccccddddeeeeffff0000111122223333444455556666777788889999i0",
+  "from_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+  "to_address": "DRPLkFEt5GNQR2xt1GtVBSsTUr63W3mBnq",
+  "transfer_type": "gift",
+  "note": "Gifted to community winner of Doge Punks raffle #001",
+  "transfer_txid": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "chain": "dogecoin",
+  "ts": 1700001200
+}

@@ -1,0 +1,18 @@
+{
+  "_comment": "ÐMP v1.0+ root collection with optional parent_inscription_id (ÐMP metadata). Strong on-chain parent: DRC-721 'parent' in the ord tag trailer + UTXO validation — see ../../dogenals-core/README.md",
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "collection",
+  "slug": "pups-child",
+  "name": "Doge Pups (child of Doge Punks)",
+  "parent_inscription_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "creator_address": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+  "type": "fixed",
+  "supply": "1",
+  "criteria": {
+    "mode": "explicit",
+    "inscription_ids": ["b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3i0"]
+  },
+  "chain": "dogecoin",
+  "ts": 1700000000
+}

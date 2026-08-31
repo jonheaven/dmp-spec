@@ -1,0 +1,18 @@
+{
+  "_comment": "ÐMP v1.0 auction op",
+  "p": "Ð:MP",
+  "v": "1.0",
+  "op": "auction",
+  "inscription_id": "1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffffi0",
+  "seller": "D8mZsgKwmSQWYRPEMCcm8KzNFj1JVF5UpA",
+  "reserve_price": "500000000",
+  "start_price": "100000000",
+  "currency": "DOGE",
+  "auction_mode": "seller_can_accept_early",
+  "min_bid_increment": "50000000",
+  "start_ts": 1700000000,
+  "expiry": 1700007200,
+  "collection_id": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2i0",
+  "chain": "dogecoin",
+  "ts": 1700000001
+}

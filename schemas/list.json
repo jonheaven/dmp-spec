@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ÐMP list Operation Schema",
+  "description": "JSON Schema for ÐMP list operations (v1.0)",
+  "type": "object",
+  "properties": {
+    "p": {
+      "const": "Ð:MP",
+      "description": "Protocol identifier"
+    },
+    "v": {
+      "const": "1.0",
+      "description": "Protocol version"
+    },
+    "op": {
+      "const": "list",
+      "description": "Operation type"
+    },
+    "inscription_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}i[0-9]+$",
+      "description": "Inscription ID in format <txid>i<vout>"
+    },
+    "price": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Price in koinu (decimal integer string)"
+    },
+    "currency": {
+      "const": "DOGE",
+      "description": "Currency (currently only DOGE supported)"
+    },
+    "seller": {
+      "type": "string",
+      "description": "Seller's Dogecoin address"
+    },
+    "psdt": {
+      "type": "string",
+      "description": "Optional PSBT data for settlement (base64 encoded)"
+    },
+    "expiry": {
+      "type": "integer",
+      "description": "Optional expiry timestamp (Unix epoch seconds)"
+    },
+    "chain": {
+      "const": "dogecoin",
+      "description": "Chain identifier (optional, defaults to dogecoin)"
+    },
+    "nonce": {
+      "type": "string",
+      "description": "Optional nonce for deduplication"
+    },
+    "royalty_address": {
+      "type": "string",
+      "description": "Creator royalty pay-to address"
+    },
+    "royalty_bps": {
+      "description": "Royalty basis points of sale price (0-1000 recommended)",
+      "oneOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "integer", "minimum": 0, "maximum": 10000 }]
+    },
+    "market_fee_bps": {
+      "description": "Total marketplace fee bps of sale price (listing + settlement venues combined)",
+      "oneOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "integer", "minimum": 0, "maximum": 2000 }]
+    },
+    "listing_fee_address": {
+      "type": "string",
+      "description": "Listing venue fee address (collaborative multi-marketplace rake)"
+    },
+    "listing_fee_share_bps": {
+      "description": "Share of market_fee to listing venue (default 5000 = 50%)",
+      "oneOf": [{ "type": "string", "pattern": "^[0-9]+$" }, { "type": "integer", "minimum": 0, "maximum": 10000 }]
+    },
+    "listing_marketplace": {
+      "type": "string",
+      "description": "Optional listing venue id/domain (e.g. dogenals.com)"
+    }
+  },
+  "required": ["p", "v", "op", "inscription_id", "price", "currency", "seller"],
+  "additionalProperties": true
+}
