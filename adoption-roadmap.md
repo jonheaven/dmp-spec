@@ -1,7 +1,7 @@
 # ÐMP Adoption Roadmap
 
 Version: v1.0 (Draft)
-Last Updated: 2026-04-24
+Last Updated: 2026-09-03
 
 ---
 
@@ -17,6 +17,11 @@ converge on the same market state from chain data alone.
 marketplace standard for Dogecoin, implementers will choose it because it solves real problems they
 already have — not because of marketing.
 
+**Scale hypothesis (write budget):** Millions of users mostly look. L1 fat path is the artifact + durable
+list/`psdt_hash` + sale tx (+ optional DOTC/`settle` receipt). Live books SHOULD be DogeTag + venues.
+Inscribing every bid is non-conformant as a *required* market model (MUST-111). See
+[spec.md Write budget](spec.md#write-budget-l1-surface-at-scale).
+
 ---
 
 ## Phase 1: Foundation (Current — v1.0)
@@ -30,6 +35,7 @@ already have — not because of marketing.
 - [x] IMPLEMENTATION-GUIDE.md — indexer architecture, storage schema, API surface, reorg handling
 - [x] EXAMPLES/ — canonical JSON payloads for every op
 - [x] reference-implementation/dmp_reference.py — runnable validator with test vectors
+- [x] Write budget (MUST-111+) — skinny L1 defaults documented
 - [ ] JSON Schema files in schemas/ directory (one per op, machine-validatable)
 - [ ] Test vector suite (test_vectors.json — expected pass/fail cases for all MUST rules)
 - [ ] Convergence testing: two independent indexers against real testnet data
@@ -54,12 +60,13 @@ A developer with no prior ÐMP knowledge should be able to:
 A Python (or Rust) indexer that:
 
 - Consumes Dogecoin blocks via RPC (dogecoind or wonky-dogeord-style node).
-- Parses all ÐMP inscriptions from script_sig content.
+- Parses ÐMP inscriptions from script_sig content **and** DogeTag / DOTC `OP_RETURN` signals.
 - Applies all MUST rules including UTXO-spend invalidation and address-match ownership.
+- Treats missing chatty envelopes as normal when DogeTag / venue books cover the live tape (MUST-111).
 - Exposes a REST API:
   - `GET /listings?status=active` — all active listings
   - `GET /listing/:inscription_id` — single inscription market state
-  - `GET /bids?inscription_id=:id` — active bids for inscription
+  - `GET /bids?inscription_id=:id` — active bids for inscription (inscription + DogeTag where linked)
   - `GET /auctions?status=active` — live auctions
   - `GET /collection/:slug` — collection with current head
   - `GET /provenance/:inscription_id` — full provenance chain including gaps
@@ -83,7 +90,7 @@ These use cases will drive real adoption:
 **3. Launchpad**
 - Collection manifests define official membership and royalties on-chain.
 - Trait-level bid support via collection-target offers.
-- Demand signaling from open bids visible on-chain before launch.
+- Demand signaling from open bids visible on-chain before launch (prefer DogeTag for volume).
 
 ---
 
@@ -104,14 +111,16 @@ What they give up: nothing. ÐMP is additive. Existing flows can emit ÐMP ops a
 
 ### Compatibility layer for existing venues
 
-Existing marketplaces (Doggy Market, DogeLabs, etc.) can adopt ÐMP incrementally:
+Existing marketplaces (Doggy Market, DogeLabs, etc.) can adopt ÐMP incrementally — **skinny L1 first**:
 
-- **Emit settle ops** for completed trades → provides on-chain settlement proof without changing
-  listing flows. Lowest possible integration effort, immediate provenance benefit.
-- **Emit list ops** for new listings → enables shared discovery across ÐMP indexers.
-- **Emit collection manifests** for their collections → provides verified creator provenance.
+- **Emit settle ops or DOTC** for completed trades → on-chain sale proof without listing-flow changes.
+- **Emit list ops with `psdt_hash`** (PSDT off-band) for new listings → shared discovery without fat envelopes.
+- **Emit collection manifests** for their collections → verified creator provenance.
+- **Keep live bids on DogeTag / venue books** → do not inscribe every bid war click.
 
 Each step is independent. Marketplaces can adopt one piece without committing to full integration.
+Inscription `offer` / `accept` remain available for provenance-grade negotiation; they are not the default
+for chatter.
 
 ### Marketplace linking field (optional draft field)
 

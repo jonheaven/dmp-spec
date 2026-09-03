@@ -3,7 +3,7 @@
 
 Version: v1.0 (Draft)
 Status: Pre-launch draft
-Last Updated: 2026-08-30
+Last Updated: 2026-09-03
 Chain: Dogecoin (and compatible Dogecoin-fork chains)
 **Canonical public spec:** [github.com/jonheaven/dmp-spec](https://github.com/jonheaven/dmp-spec)
 
@@ -22,6 +22,12 @@ implementations SHOULD treat it as a precise target for independent testing.
 ## Table of Contents
 
 1. Introduction
+   - Design Goals
+   - Wire philosophy (Satoshi + Casey)
+   - Size Guidelines
+   - Write budget (L1 surface at scale)
+   - Not Dunes / not BRC-20
+   - Versioning
 2. Terminology
 3. Envelope Format
    - 3.1 Top-level fields
@@ -61,9 +67,13 @@ implementations SHOULD treat it as a precise target for independent testing.
 
 ## 1. Introduction
 
-The Dogenals Marketplace Protocol (ÐMP) is an open, on-chain standard for Dogecoin NFT marketplace actions
-encoded as Dogenals inscriptions. ÐMP Intents are permanent receipts for market behavior: list, bid, auction,
-offer, counteroffer, accept, decline, settle, cancel, transfer, and collection governance.
+The Dogenals Marketplace Protocol (ÐMP) is an open, on-chain standard for Dogecoin **NFT / Doginal**
+marketplace actions. ÐMP Intents are permanent receipts for market behavior: list, bid, auction, offer,
+counteroffer, accept, decline, settle, cancel, transfer, and collection governance.
+
+Authoritative ÐMP JSON is carried in a Doginal inscription envelope (`p: "Ð:MP"`). That is the durable
+record format — **not** the required wire for every market click. High-churn buy interest, live books, and
+optional sale receipts use OP_RETURN paths (DogeTag, DOTC) and off-band PSDT bytes; see **Write budget**.
 
 ÐMP is an **intent and proof layer**, not an atomic execution layer. Listings declare seller intent; settlements
 prove that a valid on-chain transfer occurred. Indexers verify proof against real transaction data. No protocol
@@ -107,6 +117,53 @@ of the dog UTXO). A reveal-sized parent makes a multi-KB `psdt` even when JSON k
 - Sellers SHOULD move the dog to a **skinny child UTXO** (simple self-transfer) before listing if they
   intend to embed `psdt` on-chain.
 - Future versions MAY add an optional compact `"c"` body. Parsers MUST fall back to raw JSON.
+
+### Write budget (L1 surface at scale)
+
+Dogecoin Doginals live in **scriptSig** (`OP_FALSE OP_IF "ord" …`), not Bitcoin witness. There is **no
+witness discount**. Envelope bytes compete with ordinary tx weight and inflate historical chain data.
+Treating every bid, offer, decline, or page view as a fat inscription is the BRC-20 / old DRC-20 failure
+mode. ÐMP MUST NOT require that model.
+
+**NFT scale ≠ token scale.** Fungible inscription tokens scale with *activity* (every mint/transfer is
+another envelope). Collections scale with *pieces*, then with *sales*. A 10k collection is already 10k
+unique UTXOs; listing does not spend the dog; selling does (ownership moved). Millions of users mostly
+**look**. On-chain writes are durable lists, a fraction of negotiations, cancels, and settlements.
+
+**MUST-111:** A complete ÐMP market **MUST NOT** require an inscription envelope for every bid, offer,
+counteroffer, accept, decline, cancel, or page view. Indexers and venues that only surface envelope ops
+remain conformant when they also index DogeTag / DOTC / payment txs; they MUST NOT claim that missing
+chatty envelopes make the protocol incomplete.
+
+**MUST-112:** Sale truth is the **payment + dog-move transaction** (`settlement_txid` / equivalent). A
+ÐMP `settle` inscription is an optional durable receipt that points at that tx — not a substitute for it.
+A DOTC (`dotc|1|…` in `OP_RETURN` on the move tx) MAY serve as the live receipt; a later `settle`
+MAY reference that txid.
+
+**SHOULD-113 (write budget):** Venues and wallets SHOULD prefer the cheapest conforming path:
+
+| Write | Fat envelope (`Ð:MP` inscription)? | Preferred default at scale |
+| --- | --- | --- |
+| Collection genesis / `collection-update` | Yes (rare) | Inscription |
+| List / auction terms | Sometimes | Compact inscription; prefer `psdt_hash` over embedded `psdt` when the parent tx is fat |
+| Full PSDT bytes | No (default) | Off-band / venue cache; embed only for portable Buy Now after skinny child UTXO |
+| Bid / offer / decline chatter | No | [DogeTag](dogetag-offers.md) (~40-byte `OP_RETURN`) and/or venue off-chain book |
+| Durable negotiated `offer` / `accept` | Optional | Inscription when parties want provenance-grade negotiation |
+| Cancel | Cheap signal | Prefer spend/invalidation or compact signal; inscription `cancel` remains valid |
+| Sale (money + dog move) | N/A — always on L1 as a normal tx | Always |
+| `settle` / DOTC receipt | Optional | DOTC on the move tx, or **one** inscription per sale — not per click |
+
+**Hybrid remains valid:** raw transfers without ÐMP still work; provenance shows a gap (honest UX).
+Hash-only `list` (`psdt_hash`, PSDT off-band) is valid per §3.4. Full inscription ops stay first-class
+when parties choose them; the write budget constrains *defaults*, not capability.
+
+### Not Dunes / not BRC-20
+
+ÐMP is **not** a fungible token protocol. Dunes / ÐogeTreats move interchangeable
+units via compact integer edicts in `OP_RETURN`. They have no notion of “this specific Doginal, this
+price, this PSDT, this royalty output.” Inventing marketplace fields inside a dunestone would be a
+**new** metaprotocol — Dunes parsers would cenotaph or ignore them. Keep Dunes for fungibles; keep ÐMP
+for unique pieces. Do not answer L1-scale critiques by pretending Runes-style edicts replace NFT intents.
 
 ### Versioning
 
@@ -508,6 +565,14 @@ Defines authoritative collection metadata and membership rules.
   link remains DogeRelics + UTXO rules in [DogeRelics §3](../dogerelics/README.md#3-parent-and-utxo-validation).
   A collection without a native ÐMP `parent_inscription_id` and without a DRC-721 `parent` tag is still
   a valid ÐMP `collection` when all other `collection` rules pass.
+
+**Relationship to DRC-721 (informative):** DRC-721 and ÐMP **compose**; they are not two encodings of
+the same job. See [drc721-and-dmp.md](../../comparisons/drc721-and-dmp.md). In particular:
+
+- Native envelope **tag 3** / DRC-721 `parent` on a **child** is piece provenance. **Verified** only if
+  the child’s first reveal **spends** the parent UTXO ([DogeRelics §3](../dogerelics/README.md#3-parent-and-utxo-validation)).
+- `criteria.mode: "parent"` is a **membership rule** for this collection (who is a member), not that UTXO proof.
+- `parent_inscription_id` on this op is a **parent collection** pointer (hierarchy), not “this piece’s parent.”
 
 #### Schema
 
@@ -1279,7 +1344,9 @@ These snippets define interoperable minimum validation shape. Interpret alongsid
 
 ### 4.14 DogeTag Offers (OP_RETURN signaling extension)
 
-ÐMP DogeTag Offers are a lightweight **signal**, not a replacement for ÐMP `offer`. The normative extension is
+ÐMP DogeTag Offers are a lightweight **signal** for buy interest. They are the **preferred default** for
+chatty bids/offers at scale (see **Write budget** / MUST-111). They do **not** replace a provenance-grade
+ÐMP `offer` when parties choose the inscription path. The normative extension is
 [dogetag-offers.md](dogetag-offers.md).
 
 Rules:
@@ -1287,7 +1354,10 @@ Rules:
 - A DogeTag Offer **MUST NOT** be treated as escrow or settlement.
 - A full ÐMP `offer` **MAY** reference a DogeTag signal via `tag_txid`.
 - Wallets and indexers **SHOULD** surface DogeTags as buy-interest pings with recipient attention amounts.
-- Marketplaces **MUST** keep normal ÐMP `offer`, `accept`, and `settle` rules authoritative.
+- When an inscription `offer`, `accept`, or `settle` is present, those ops remain authoritative for that
+  negotiation. Venues **SHOULD** keep the live book on DogeTag + off-chain state and reserve envelopes for
+  durable list/auction terms and optional sale receipts (DOTC or one `settle` per sale).
+- Marketplaces **MUST NOT** require every bid war click to be an inscription to call themselves ÐMP-complete.
 
 ---
 
@@ -1428,6 +1498,17 @@ Allowed `criteria.mode` values:
 | `fixed`         | `explicit`, `parent`, `range`    |
 | `dynamic`       | `creator_signed`, `rule_based`   |
 
+`criteria.mode` is **membership**, not DRC-721 verification:
+
+- `explicit` — members are the listed `inscription_ids` (with `signed_list` when required).
+- `parent` — members are inscriptions whose **native parent** (envelope tag 3 and/or DRC-721 `parent`)
+  is **this collection inscription**. Indexers MUST document whether membership requires a **verified**
+  parent UTXO spend or accepts **claimed** tags. Tag-only children MUST NOT be labeled spec-verified DRC-721.
+- `range` — members fall in an indexer-documented inscription id / number range.
+
+This is distinct from optional root `parent_inscription_id` (a parent *collection*). Builder map:
+[drc721-and-dmp.md](../../comparisons/drc721-and-dmp.md).
+
 Slug format MUST match `^[a-z0-9-]+$` with max 64 characters. Slugs are unique per chain; earliest
 confirmed inscription by canonical ordering wins.
 
@@ -1526,6 +1607,9 @@ Any op failing a MUST rule is invalid.
 - MUST-103: use each op’s own JSON `ts` for relative comparisons unless this spec names MTP(block) — Section 3.3.
 - MUST-109: omitted `currency` / `chain` / list `listing_type` default to `"DOGE"` / `"dogecoin"` / `"fixed_price"` (Section 3.2). Present values MUST match those defaults except `listing_type` MAY be `"auction"`.
 - MUST-110: if both `psdt` and `psdt_hash` are present, `psdt_hash` MUST be SHA-256 of the decoded PSDT bytes (Section 3.4).
+- MUST-111: a complete ÐMP market MUST NOT require an inscription for every bid/offer/decline/cancel/page view (Write budget).
+- MUST-112: sale truth is the payment + dog-move tx; `settle` / DOTC are optional receipts that point at it (Write budget).
+- SHOULD-113: prefer DogeTag / off-band PSDT / DOTC / `psdt_hash` per the Write budget table; envelopes for durable collection + list/auction + optional per-sale receipt.
 
 ### 13.2 list
 
@@ -1671,7 +1755,7 @@ Any op failing a MUST rule is invalid.
 
 When multiple MUST rules fail, implementations SHOULD report the first failing rule in this priority:
 
-1. Universal envelope rules (MUST-001 through MUST-008, MUST-102, MUST-103, MUST-109, MUST-110)
+1. Universal envelope rules (MUST-001 through MUST-008, MUST-102, MUST-103, MUST-109, MUST-110, MUST-111, MUST-112)
 2. Ownership and UTXO-control rules (MUST-011, MUST-013, MUST-015, MUST-076)
 3. Operation shape and required-field rules (MUST-010, MUST-020, MUST-040, MUST-050, MUST-060,
    MUST-070, MUST-074, MUST-080–083, MUST-090)
@@ -1809,6 +1893,10 @@ See EXAMPLES directory for canonical operation payloads, including:
 - Collection manifests and `collection-update` rules.
 - Optional root `collection.parent_inscription_id`, aligned with DRC-721 native `parent` / UTXO validation.
 - Creator signatures, canonical ordering, provenance gap handling, and settlement verification.
+- **Write budget (MUST-111 / MUST-112 / SHOULD-113):** durable envelopes for rare collection + list/auction
+  pointers; DogeTag / off-chain books for chatty bids; sale tx as money truth; optional DOTC or one `settle`
+  per sale — not an inscription per click. Dogecoin envelopes are scriptSig (no witness discount).
 - ÐMP DogeTag Offers by reference as a lightweight OP_RETURN signaling extension.
+- Explicit split from Dunes/Treats (fungible edicts ≠ unique Doginal marketplace intents).
 
 This specification is pre-launch. No prior ÐMP mint or deployment constrains this launch draft.

@@ -3,20 +3,22 @@
 
 Version: v0.1 (Draft)  
 Status: Draft extension to ÐMP  
-Last Updated: 2026-04-24  
+Last Updated: 2026-09-03  
 Chain: Dogecoin
 
 ---
 
 ## 1. Introduction
 
-ÐMP DogeTag Offers are a lightweight **signaling layer** for ÐMP offers using Dogecoin `OP_RETURN` outputs plus
+ÐMP DogeTag Offers are a lightweight **signaling layer** for ÐMP buy interest using Dogecoin `OP_RETURN` outputs plus
 a small DOGE output to the intended recipient. The goal is simple: let marketplaces, wallets, and individuals
 signal buy interest to a Doginal owner even when that owner is not connected to a marketplace.
 
-DogeTag Offers do **not** replace ÐMP `offer`, `accept`, or `settle`. They are discoverable pings that may lead
-to a full ÐMP offer flow. The DOGE output is intentional anti-spam friction and may accumulate in the recipient
-wallet whether or not the recipient responds.
+At scale, DogeTag Offers are the **preferred default** for chatty bids/offers (ÐMP write budget / MUST-111).
+They do **not** replace a provenance-grade ÐMP `offer`, `accept`, or `settle` when parties choose the inscription
+path. They are discoverable pings that may lead to a full ÐMP offer flow — or to a direct fill without ever
+inscribing negotiation chatter. The DOGE output is intentional anti-spam friction and may accumulate in the
+recipient wallet whether or not the recipient responds.
 
 ---
 
@@ -130,7 +132,7 @@ DogeTag Offers intentionally make the sender pay both miners and recipients.
 
 ## 8. Optional Ðignal Link
 
-If flag bit 2 is set, the sender MAY separately create a Ðignal message that
+If flag bit 2 is set, the sender MAY separately create a [Ðignal](../dignal/spec.md) message that
 contains richer encrypted context. The DogeTag itself carries no plaintext message body.
 
 ---
@@ -188,7 +190,7 @@ contains richer encrypted context. The DogeTag itself carries no plaintext messa
 - Sound hints are untrusted; wallets must let users disable them.
 - Dust and standardness policy may change; wallets should use configurable thresholds.
 - If a Ðignal link exists, wallets **MUST** treat it as encrypted negotiation context only; it is not an offer acceptance, escrow, or settlement.
-- Wallet notification behavior **SHOULD** rate-limit repeated low-value tags from one sender and respect user-set minimum attention amounts.
+- Wallet notification behavior **SHOULD** follow [../../docs/guides/wallet-notifications.md](../../docs/guides/wallet-notifications.md).
 - Decoded payloads **SHOULD** validate against [schemas/dmp-offer-signal-decoded.json](schemas/dmp-offer-signal-decoded.json); binary fixtures are in [vectors/dmp-offer-signal-vectors.json](vectors/dmp-offer-signal-vectors.json).
 
 ---

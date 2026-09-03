@@ -1,7 +1,7 @@
 # Dogenals Marketplace Protocol (ÐMP)
 ## Philosophy and Design Decisions
 
-Last Updated: 2026-08-30
+Last Updated: 2026-09-03
 Status: Canonical project philosophy and product architecture reference
 
 ---
@@ -37,17 +37,17 @@ Dogenals follows a Doge-native, Robin Hood style ethos:
 ÐMP exists to remove dependence on centralized marketplace databases and APIs.
 
 The wire follows Satoshi + Casey: the **seller PSDT** is the contract; the **inscription** is an
-indexable pointer. Omit implied fields. Pay venues with addresses, not labels. Keep every marketplace
-op (`list` through `vote`).
+indexable durable pointer. Omit implied fields. Pay venues with addresses, not labels. Keep every
+marketplace op (`list` through `vote`) available. Prefer the [L1 write budget](spec.md#write-budget-l1-surface-at-scale)
+so chatty bids ride DogeTag / venue books instead of fat scriptSig envelopes.
 
-With ÐMP, market behavior is encoded as chain-verifiable inscriptions:
+With ÐMP, market behavior is encoded as chain-verifiable intents:
 
-- listings
-- bids
+- listings (durable; prefer `psdt_hash` when the parent tx is fat)
+- bids / private offers (prefer DogeTag at scale; inscription when provenance-grade)
 - auctions
-- private offers
-- counteroffers, accepts, and declines
-- settlements and cancellations
+- counteroffers, accepts, and declines (same scale preference)
+- settlements and cancellations (sale tx is money truth; settle/DOTC optional receipts)
 - collection provenance and governance hooks
 
 This gives the ecosystem durable guarantees:
@@ -55,6 +55,8 @@ This gives the ecosystem durable guarantees:
 - portability: users can move across wallets and marketplaces without losing meaning
 - verifiability: any indexer can reconstruct valid state from chain data
 - resilience: market history survives the failure of any single platform
+- honesty about L1 cost: Dogecoin Doginals are scriptSig (no witness discount); NFT markets scale with
+  pieces + sales, not with fungible inscription-transfer spam. Dunes is the fungible answer; ÐMP is not Dunes.
 
 ÐMP is not a branding layer. It is anti-gatekeeping infrastructure.
 

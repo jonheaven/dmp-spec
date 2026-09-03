@@ -17,6 +17,19 @@ Future changes after public launch should be tracked here with clear versioning 
 
 ## Draft updates (pre-launch)
 
+### 2026-09-03 — L1 write budget (UTXO-maxi hardening)
+
+Answer to “inscription ÐMP won’t scale to millions of users”: that critique only lands if every bid is a
+fat envelope (BRC-20 / old DRC-20 mode). NFT markets scale with pieces + sales, not fungible transfer chatter.
+Dogecoin envelopes are **scriptSig** (no witness discount).
+
+- **MUST-111**: complete market MUST NOT require an inscription per bid/offer/decline/cancel/page view.
+- **MUST-112**: sale truth is payment + dog-move tx; `settle` / DOTC are optional receipts.
+- **SHOULD-113**: write-budget table — DogeTag / off-band PSDT / `psdt_hash` / DOTC for chatter; envelopes for
+  durable collection + list/auction + optional one receipt per sale.
+- Explicit **Not Dunes**: fungible edicts cannot bind unique Doginal + PSDT + royalty terms.
+- README / §4.14 / DogeTag / adoption roadmap aligned: live book off envelopes by default.
+
 ### 2026-08-30 — Satoshi + Casey wire reboot
 
 The fill template is the contract (`SIGHASH_SINGLE | ANYONECANPAY` seller PSDT). The inscription is a pointer

@@ -4,13 +4,14 @@
 
 ÐMP is the on-chain *record* of market intent: listings, auctions, bids, offers, settlements, transfers, and collection governance. Any indexer with a full node can *verify* those intents against UTXO movement; no venue’s API is the truth.
 
-The **seller-signed PSDT** is the fill contract (Satoshi). The **inscription envelope** is the pointer Casey-style indexers already scan. Do not inscribe implied facts (`currency`, `chain`, default `listing_type`). Pay listing venues with `listing_fee_address`, not a domain string. All ops remain.
+The **seller-signed PSDT** is the fill contract (Satoshi). The **inscription envelope** is the durable pointer Casey-style indexers already scan — **not** the required wire for every bid. Do not inscribe implied facts (`currency`, `chain`, default `listing_type`). Pay listing venues with `listing_fee_address`, not a domain string. All ops remain available; the [write budget](spec.md#write-budget-l1-surface-at-scale) constrains defaults at scale.
 
 | | |
 | ---: | --- |
-| **Version** | v1.0+ · v1.0 [additive `parent_inscription_id`](spec.md#v13-2026-04-25) |
+| **Version** | v1.0+ · write budget [MUST-111+](spec.md#write-budget-l1-surface-at-scale) |
 | **Class** | Marketplace **intent and proof** layer (not custody, not a fungible token) |
-| **Payload** | JSON in a Dogecoin inscription with `"p": "Ð:MP"` |
+| **Durable payload** | JSON in a Dogecoin inscription with `"p": "Ð:MP"` |
+| **Scale path** | Artifact + list/`psdt_hash` + sale tx; DogeTag/DOTC for chatter & receipts — not an inscription per click |
 | **Status** | v1.0 Launch Draft |
 | **Chain** | Dogecoin |
 | **License** | [MIT](LICENSE) |
@@ -18,7 +19,7 @@ The **seller-signed PSDT** is the fill contract (Satoshi). The **inscription env
 
 *Peer analogue:* Bitcoin inscriptions with marketplace JSON — ÐMP is the [Dogecoin](https://github.com/dogecoin/dogecoin) native rulebook for that class of application.
 
-> ÐMP is **not** a token standard. It does not create fungible tokens. It governs how NFT (Doginal) trades are recorded, verified, and discovered on-chain.
+> ÐMP is **not** a token standard. It does not create fungible tokens. It governs how NFT (Doginal) trades are recorded, verified, and discovered on-chain. Dunes/Treats handle fungibles; ÐMP handles unique pieces. Dogecoin envelopes are **scriptSig** (no Bitcoin-style witness discount) — keep chatty market tape off the fat path.
 
 ## Authors
 
@@ -63,13 +64,15 @@ If you ship this in a wallet, marketplace, or indexer, you are implementing **th
 
 **Full provenance chain.** Every on-chain owner change is tracked. Provenance gaps (inscriptions transferred without a ÐMP op) are detected and flagged transparently.
 
-**Rich marketplace operations.** ÐMP supports fixed-price listings, time-based auctions, private offers, counter-offers, and acceptance/decline flows — all on-chain.
+**Rich marketplace operations.** ÐMP supports fixed-price listings, time-based auctions, private offers, counter-offers, and acceptance/decline flows. At scale, chatty bids SHOULD use DogeTag / venue books; durable list + sale proof stay on L1.
 
 **Signature-based authorization.** Operations are cryptographically authorized using Dogecoin signing, eliminating the need for smart contracts.
 
-**DogeTag offer signaling.** Optional [ÐMP DogeTag Offers](dogetag-offers.md) use lightweight OP_RETURN signals plus small recipient DOGE outputs so wallets can detect buy interest even when a user is not connected to a marketplace.
+**DogeTag offer signaling.** Optional [ÐMP DogeTag Offers](dogetag-offers.md) use lightweight OP_RETURN signals plus small recipient DOGE outputs so wallets can detect buy interest even when a user is not connected to a marketplace. This is the preferred default for buy-interest pings (MUST-111).
 
 **DOTC receipts.** Completed live / private OTC deals MAY emit DOTC (`dotc|1|…` in `OP_RETURN` on the inscription-move tx) without a ÐMP inscription. A later ÐMP `settle` MAY reference that DOTC txid. DOTC is not a listing protocol.
+
+**L1 write budget.** See [spec.md Write budget](spec.md#write-budget-l1-surface-at-scale): collections ≠ fungible transfer spam; millions of users is not millions of envelopes.
 
 ---
 
@@ -79,8 +82,9 @@ If you ship this in a wallet, marketplace, or indexer, you are implementing **th
 | --- | --- |
 | Protocol marker | `"p": "Ð:MP"` |
 | Supported versions | `"1.0"` |
-| Storage method | Ordinal inscription |
-| Data format | JSON |
+| Durable storage | Ordinal inscription (scriptSig envelope) |
+| Scale signaling | DogeTag / DOTC `OP_RETURN`; `psdt_hash` off-band |
+| Data format | JSON (durable); compact binary (DogeTag) |
 | Signature scheme | Dogecoin signed message (secp256k1 + double-SHA256) |
 
 ---

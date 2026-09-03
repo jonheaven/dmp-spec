@@ -290,10 +290,12 @@ An attacker with enough DOGE can create millions of low-value listings, bids, an
 indexer state.
 
 **Mitigations**:
+- **Write budget (MUST-111 / SHOULD-113):** venues SHOULD keep live bid/offer chatter on DogeTag +
+  off-chain books so spam does not land as 4 KB envelopes by default.
 - Indexers SHOULD archive terminal (settled, expired, cancelled, invalidated) states to cold storage.
 - Indexers MAY implement minimum listing price thresholds as local policy (not protocol level).
 - The `bid_fee` optional field on bids provides a similar anti-spam vector as `offer_fee`.
-  Implementations in high-volume markets SHOULD require `bid_fee`.
+  Implementations in high-volume markets SHOULD require `bid_fee` when inscription bids are used.
 
 ### 4.3 Economic Spam Modeling
 
